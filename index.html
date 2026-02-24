@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shivr-dev Studio | 官方主页</title>
+    <link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --mc-green: #52A044;
+            --mc-green-hover: #3E7C33;
+            --mc-dark-grey: #313131;
+            --mc-button-shadow: #2D5A25;
+            --mc-button-light: #5EBD4D;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'ZCOOL KuaiLe', 'Courier New', sans-serif;
+            background-color: #212121;
+            /* Minecraft 经典的泥土背景 */
+            background-image: url('https://www.minecraft.net/etc.clientlibs/minecraft/clientlibs/main/resources/img/background/dirt.png');
+            background-repeat: repeat;
+            background-size: 64px;
+            image-rendering: pixelated;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* 顶部导航 */
+        header {
+            background-color: var(--mc-dark-grey);
+            border-bottom: 4px solid #1e1e1e;
+            padding: 20px 0;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+        }
+
+        .studio-name {
+            font-size: 2.5rem;
+            color: #FFFFFF;
+            text-shadow: 4px 4px #000;
+            letter-spacing: 2px;
+        }
+
+        /* 主容器 */
+        .container {
+            flex: 1;
+            max-width: 1000px;
+            margin: 40px auto;
+            background: rgba(0, 0, 0, 0.75);
+            border: 6px solid #000;
+            padding: 40px;
+            text-align: center;
+        }
+
+        /* 宣传图区域 */
+        .hero-section {
+            margin-bottom: 40px;
+        }
+
+        .map-logo {
+            max-width: 80%;
+            height: auto;
+            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.8));
+            transition: transform 0.3s ease;
+        }
+
+        .map-logo:hover {
+            transform: scale(1.05);
+        }
+
+        h1 {
+            color: #FFFF55;
+            text-shadow: 2px 2px #3F3F00;
+            font-size: 2rem;
+        }
+
+        .description {
+            font-size: 1.2rem;
+            line-height: 1.8;
+            color: #E0E0E0;
+            margin: 20px 0;
+        }
+
+        /* MC 风格按钮系统 */
+        .button-group {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .mc-button {
+            display: inline-block;
+            padding: 18px 36px;
+            font-size: 1.4rem;
+            text-decoration: none;
+            color: white;
+            background-color: var(--mc-green);
+            border: 4px solid #000;
+            box-shadow: inset -4px -4px 0px var(--mc-button-shadow), 
+                        inset 4px 4px 0px var(--mc-button-light);
+            cursor: pointer;
+            transition: all 0.1s;
+        }
+
+        .mc-button:hover {
+            background-color: var(--mc-green-hover);
+            transform: translateY(-2px);
+        }
+
+        .mc-button:active {
+            transform: translateY(4px);
+            box-shadow: inset 4px 4px 0px var(--mc-button-shadow);
+        }
+
+        .secondary-btn {
+            background-color: #666;
+            box-shadow: inset -4px -4px 0px #333, inset 4px 4px 0px #999;
+        }
+
+        /* 页脚 */
+        footer {
+            padding: 20px;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #888;
+            background: rgba(0,0,0,0.5);
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="studio-name">SHIVR-DEV STUDIO</div>
+</header>
+
+<div class="container">
+    <div class="hero-section">
+        <img src="logo.png" alt="酷跑KourPar" class="map-logo">
+        <h1>巅峰动作体验：酷跑 KourPar</h1>
+    </div>
+
+    <div class="description">
+        <p>欢迎来到 Shivr-dev 工作室！我们专注于为《我的世界》中国版玩家打造高品质的游戏内容。</p>
+        <p>在这里，每一块方块都经过精心打磨，旨在为您提供最纯粹的竞技与探索乐趣。</p>
+    </div>
+
+    <div class="button-group">
+        <a href="https://shivr-dev.github.io/ideas/" class="mc-button">查看地图更新界面</a>
+        <a href="#" class="mc-button secondary-btn">前往网易资源中心</a>
+    </div>
+</div>
+
+<footer>
+    <p>&copy; 2026 Shivr-dev Studio. Not an official Minecraft product. Not approved by or associated with Mojang or NetEase.</p>
+</footer>
+
+</body>
+</html>
