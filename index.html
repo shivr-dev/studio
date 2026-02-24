@@ -3,162 +3,231 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shivr-dev Studio | 官方主页</title>
-    <link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
+    <title>Shivr-dev Studio | 官方网站</title>
+    <link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=Noto+Sans+SC:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --mc-green: #52A044;
-            --mc-green-hover: #3E7C33;
-            --mc-dark-grey: #313131;
-            --mc-button-shadow: #2D5A25;
-            --mc-button-light: #5EBD4D;
+            --mc-green: #47892b;
+            --mc-green-light: #5db03c;
+            --mc-green-dark: #356620;
+            --mc-stone: #313131;
+            --mc-text-yellow: #FFFF55;
+            --container-bg: #f4f4f4;
         }
 
         body {
             margin: 0;
             padding: 0;
-            font-family: 'ZCOOL KuaiLe', 'Courier New', sans-serif;
-            background-color: #212121;
-            /* Minecraft 经典的泥土背景 */
-            background-image: url('https://www.minecraft.net/etc.clientlibs/minecraft/clientlibs/main/resources/img/background/dirt.png');
-            background-repeat: repeat;
-            background-size: 64px;
-            image-rendering: pixelated;
+            font-family: 'Noto Sans SC', sans-serif;
+            background-color: #121212;
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        /* --- 导航栏 --- */
+        nav {
+            background: var(--mc-stone);
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 50px;
+            border-bottom: 4px solid #111;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-logo {
+            font-family: 'ZCOOL KuaiLe';
             color: white;
+            font-size: 24px;
+            text-shadow: 2px 2px #000;
+        }
+
+        /* --- Hero 区域 (头图) --- */
+        .hero {
+            background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), 
+                        url('https://www.minecraft.net/content/dam/games/minecraft/key-art/Homepage_Update-Ender-Eyes_600x338.jpg'); /* 占位背景 */
+            background-size: cover;
+            background-position: center;
+            height: 60vh;
             display: flex;
             flex-direction: column;
-            min-height: 100vh;
-        }
-
-        /* 顶部导航 */
-        header {
-            background-color: var(--mc-dark-grey);
-            border-bottom: 4px solid #1e1e1e;
-            padding: 20px 0;
+            align-items: center;
+            justify-content: center;
             text-align: center;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            border-bottom: 8px solid var(--mc-green);
         }
 
-        .studio-name {
-            font-size: 2.5rem;
-            color: #FFFFFF;
-            text-shadow: 4px 4px #000;
-            letter-spacing: 2px;
+        .hero-logo {
+            max-width: 450px;
+            filter: drop-shadow(0 0 20px rgba(0,0,0,0.5));
+            animation: float 3s ease-in-out infinite;
         }
 
-        /* 主容器 */
-        .container {
-            flex: 1;
-            max-width: 1000px;
-            margin: 40px auto;
-            background: rgba(0, 0, 0, 0.75);
-            border: 6px solid #000;
-            padding: 40px;
-            text-align: center;
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
         }
 
-        /* 宣传图区域 */
-        .hero-section {
-            margin-bottom: 40px;
-        }
-
-        .map-logo {
-            max-width: 80%;
-            height: auto;
-            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.8));
-            transition: transform 0.3s ease;
-        }
-
-        .map-logo:hover {
-            transform: scale(1.05);
-        }
-
-        h1 {
-            color: #FFFF55;
-            text-shadow: 2px 2px #3F3F00;
-            font-size: 2rem;
-        }
-
-        .description {
-            font-size: 1.2rem;
-            line-height: 1.8;
-            color: #E0E0E0;
-            margin: 20px 0;
-        }
-
-        /* MC 风格按钮系统 */
-        .button-group {
+        /* --- 核心展示区 --- */
+        .main-content {
+            background-color: var(--container-bg);
+            padding: 60px 20px;
             display: flex;
             justify-content: center;
-            flex-wrap: wrap;
-            gap: 20px;
-            margin-top: 30px;
         }
 
-        .mc-button {
-            display: inline-block;
-            padding: 18px 36px;
-            font-size: 1.4rem;
-            text-decoration: none;
-            color: white;
-            background-color: var(--mc-green);
+        .card-container {
+            max-width: 1100px;
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+
+        /* Minecraft 风格板块 */
+        .mc-card {
+            background: white;
             border: 4px solid #000;
-            box-shadow: inset -4px -4px 0px var(--mc-button-shadow), 
-                        inset 4px 4px 0px var(--mc-button-light);
-            cursor: pointer;
+            box-shadow: 10px 10px 0px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.2s;
+        }
+
+        .mc-card:hover {
+            transform: translate(-5px, -5px);
+            box-shadow: 15px 15px 0px rgba(0,0,0,0.2);
+        }
+
+        .card-image {
+            width: 100%;
+            height: 250px;
+            background: #222;
+            object-fit: cover;
+            border-bottom: 4px solid #000;
+        }
+
+        .card-body {
+            padding: 25px;
+        }
+
+        .card-tag {
+            background: var(--mc-green);
+            color: white;
+            padding: 5px 10px;
+            font-size: 12px;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+
+        .card-title {
+            font-family: 'ZCOOL KuaiLe';
+            font-size: 28px;
+            margin: 0 0 15px 0;
+            color: #111;
+        }
+
+        /* --- 官网风格按钮 --- */
+        .btn-official {
+            display: inline-block;
+            background: var(--mc-green);
+            color: white;
+            text-decoration: none;
+            padding: 15px 40px;
+            font-family: 'ZCOOL KuaiLe';
+            font-size: 20px;
+            border-bottom: 6px solid var(--mc-green-dark);
             transition: all 0.1s;
-        }
-
-        .mc-button:hover {
-            background-color: var(--mc-green-hover);
-            transform: translateY(-2px);
-        }
-
-        .mc-button:active {
-            transform: translateY(4px);
-            box-shadow: inset 4px 4px 0px var(--mc-button-shadow);
-        }
-
-        .secondary-btn {
-            background-color: #666;
-            box-shadow: inset -4px -4px 0px #333, inset 4px 4px 0px #999;
-        }
-
-        /* 页脚 */
-        footer {
-            padding: 20px;
             text-align: center;
-            font-size: 0.9rem;
-            color: #888;
-            background: rgba(0,0,0,0.5);
+        }
+
+        .btn-official:hover {
+            background: var(--mc-green-light);
+            margin-top: 2px;
+            border-bottom-width: 4px;
+        }
+
+        .btn-official:active {
+            margin-top: 6px;
+            border-bottom-width: 0px;
+        }
+
+        /* --- 底部装饰 --- */
+        .footer-grass {
+            height: 20px;
+            background-image: url('https://www.minecraft.net/etc.clientlibs/minecraft/clientlibs/main/resources/img/background/grass-top.png');
+            background-repeat: repeat-x;
+            background-size: 40px;
+            image-rendering: pixelated;
+        }
+
+        footer {
+            background: #111;
+            color: #aaa;
+            padding: 40px 20px;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            .card-container { grid-template-columns: 1fr; }
+            .hero-logo { max-width: 80%; }
         }
     </style>
 </head>
 <body>
 
-<header>
-    <div class="studio-name">SHIVR-DEV STUDIO</div>
-</header>
+<nav>
+    <div class="nav-logo">SHIVR-DEV</div>
+    <div style="color: #ccc; font-size: 14px;">我的世界 · 网易开发者工作室</div>
+</nav>
 
-<div class="container">
-    <div class="hero-section">
-        <img src="logo.png" alt="酷跑KourPar" class="map-logo">
-        <h1>巅峰动作体验：酷跑 KourPar</h1>
-    </div>
+<section class="hero">
+    <img src="logo.png" alt="酷跑KourPar" class="hero-logo">
+    <p style="color: white; font-size: 1.5rem; text-shadow: 2px 2px 4px #000; margin-top: 20px;">
+        在像素世界，重定义跑酷的速度与激情
+    </p>
+</section>
 
-    <div class="description">
-        <p>欢迎来到 Shivr-dev 工作室！我们专注于为《我的世界》中国版玩家打造高品质的游戏内容。</p>
-        <p>在这里，每一块方块都经过精心打磨，旨在为您提供最纯粹的竞技与探索乐趣。</p>
-    </div>
+<div class="main-content">
+    <div class="card-container">
+        
+        <div class="mc-card">
+            <div style="background: #444; height: 250px; display: flex; align-items: center; justify-content: center; color: white; font-size: 40px;">
+                🚧
+            </div>
+            <div class="card-body">
+                <div class="card-tag">NEW UPDATE</div>
+                <h2 class="card-title">实时开发进展</h2>
+                <p>想要知道我们的地图又加了什么新关卡？点击下方按钮，进入我们的想法与灵感实验室。</p>
+                <br>
+                <a href="https://shivr-dev.github.io/ideas/" class="btn-official" style="width: 80%;">进入更新界面</a>
+            </div>
+        </div>
 
-    <div class="button-group">
-        <a href="https://shivr-dev.github.io/ideas/" class="mc-button">查看地图更新界面</a>
-        <a href="#" class="mc-button secondary-btn">前往网易资源中心</a>
+        <div class="mc-card">
+            <img src="https://www.minecraft.net/content/dam/games/minecraft/screenshots/Standard_Edition_1.jpg" class="card-image">
+            <div class="card-body">
+                <div class="card-tag">ABOUT US</div>
+                <h2 class="card-title">Shivr-dev Studio</h2>
+                <p>我们是活跃于网易《我的世界》中国版的开发者团队，深耕跑酷、建筑与解谜地图开发。</p>
+                <br>
+                <a href="#" class="btn-official" style="background: #555; border-color: #333; width: 80%;">联系我们</a>
+            </div>
+        </div>
+
     </div>
 </div>
 
+<div class="footer-grass"></div>
 <footer>
-    <p>&copy; 2026 Shivr-dev Studio. Not an official Minecraft product. Not approved by or associated with Mojang or NetEase.</p>
+    <p>© 2026 Shivr-dev Studio. 保留所有权利。</p>
+    <p style="margin-top: 10px; font-size: 12px;">本页面为工作室介绍页，不代表 Mojang 或网易官方。Minecraft 资产版权归其所有者所有。</p>
 </footer>
 
 </body>
