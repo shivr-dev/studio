@@ -3,89 +3,105 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shivr-dev Studio | Ore UI 交互版</title>
+    <title>Shivr-dev Studio | 官方网站</title>
     <style>
+        /* --- 严格照抄 oreui.css.txt 的核心样式 --- */
+        
         :root {
-            /* 严格参考 oreui.css.txt 变量 */
             --ore-btn-bg: #CECECE;
-            --ore-btn-green: #6CC349;
             --ore-btn-border: #1E1E1F;
             --ore-btn-shadow: #9E9E9E;
-            --ore-btn-shadow-green: #47892B;
+            --ore-green-bg: #6CC349;
+            --ore-green-shadow: #47892B;
             --ore-panel-bg: #313233;
+            --ore-panel-shadow: #242425;
         }
 
         body {
             margin: 0; padding: 0;
             background-color: #1a1a1a;
             color: #FFFFFF;
-            font-family: "Microsoft YaHei", sans-serif;
+            font-family: "NotoSans Bold", sans-serif;
             overflow-x: hidden;
         }
 
-        /* --- 动态 Logo 动画 --- */
+        /* --- 1. 标准按钮 (Button) --- */
+        .button {
+            align-self: center;
+            background-color: var(--ore-btn-bg);
+            border: 2px solid var(--ore-btn-border);
+            box-shadow: inset 0 -4px var(--ore-btn-shadow);
+            box-sizing: border-box;
+            color: #1E1E1F;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px; font-weight: bold;
+            height: 44px;
+            margin: 6px;
+            min-height: 40px;
+            outline: none;
+            padding: 0 10px 4px 10px; /* 初始底部留出 4px 给阴影 */
+            position: relative;
+            text-align: center;
+            text-decoration: none;
+            width: 100%;
+        }
+
+        /* 悬停：边框变白 */
+        .button:hover {
+            border: 2px solid #FFFFFF;
+        }
+
+        /* 按下：取消阴影，颜色变深，通过内边距实现文字下沉 */
+        .button:active {
+            background-color: #48494A;
+            box-shadow: none;
+            color: #FFFFFF;
+            padding: 4px 10px 0 10px; /* 顶部增加 4px，底部减去 4px，实现下沉感 */
+        }
+
+        /* --- 2. 绿色按钮 (Green Button) --- */
+        .green_button {
+            background-color: var(--ore-green-bg);
+            box-shadow: inset 0 -4px var(--ore-green-shadow);
+            color: #FFFFFF;
+        }
+
+        /* --- 3. 面板容器 (参考 Input 样式实现面板感) --- */
+        .ore_panel {
+            background-color: var(--ore-panel-bg);
+            border: 2px solid var(--ore-btn-border);
+            box-shadow: inset 0 4px var(--ore-panel-shadow);
+            padding: 15px;
+            margin: 10px;
+        }
+
+        /* --- 4. 其它页面布局逻辑 --- */
         .hero {
             height: 50vh;
             display: flex; align-items: center; justify-content: center;
-            background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('hero-bg.png') no-repeat center center;
+            background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('hero-bg.png') no-repeat center center;
             background-size: cover;
-            border-bottom: 4px solid var(--ore-btn-green);
+            border-bottom: 4px solid var(--ore-green-bg);
+        }
+
+        .logo-container {
+            animation: oreFloating 3s ease-in-out infinite;
         }
 
         .logo-img {
             max-width: 450px;
             filter: drop-shadow(0 10px 20px rgba(0,0,0,0.8));
-            animation: oreFloating 3.5s ease-in-out infinite;
         }
 
         @keyframes oreFloating {
-            0%, 100% { transform: translateY(0) rotate(0deg); }
-            50% { transform: translateY(-20px) rotate(1deg); }
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
         }
 
-        /* --- Ore UI 按钮样式 --- */
-        .ore-button {
-            position: relative;
-            background-color: var(--ore-btn-bg);
-            border: 2px solid var(--ore-btn-border);
-            box-shadow: inset 0 -4px var(--ore-btn-shadow);
-            color: #1E1E1F;
-            font-size: 16px; font-weight: bold;
-            padding: 12px 24px;
-            cursor: pointer;
-            transition: all 0.05s;
-            display: inline-flex; align-items: center; justify-content: center;
-            text-decoration: none;
-            width: 100%; box-sizing: border-box;
-        }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; max-width: 900px; margin: 30px auto; }
 
-        .ore-button.green {
-            background-color: var(--ore-btn-green);
-            box-shadow: inset 0 -4px var(--ore-btn-shadow-green);
-            color: #FFFFFF;
-        }
-
-        .ore-button:hover { border-color: #FFFFFF; }
-        .ore-button:active {
-            transform: translateY(2px);
-            box-shadow: none;
-        }
-
-        /* --- 消息提示 (Toast) 样式 --- */
-        #toast-container {
-            position: fixed; top: 20px; right: 20px; z-index: 10000;
-        }
-        .ore-toast {
-            background: rgba(0, 0, 0, 0.8);
-            border: 2px solid #555;
-            padding: 12px 20px;
-            margin-bottom: 10px;
-            animation: slideIn 0.3s ease-out;
-        }
-
-        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
-
-        /* --- 弹窗与抽屉逻辑 --- */
+        /* 弹窗样式 */
         .modal-overlay {
             display: none; position: fixed; top:0; left:0; width:100%; height:100%;
             background: rgba(0,0,0,0.8); z-index: 9999;
@@ -96,14 +112,18 @@
         .modal-window {
             background: var(--ore-panel-bg);
             border: 2px solid #FFFFFF;
-            width: 400px; padding: 25px;
+            width: 380px; padding: 20px;
             box-shadow: 0 0 30px rgba(0,0,0,1);
         }
 
-        /* --- 布局 --- */
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; max-width: 900px; margin: 40px auto; padding: 0 20px; }
-        .card { background: var(--ore-panel-bg); border: 2px solid var(--ore-btn-border); padding: 15px; }
+        #toast-container { position: fixed; top: 20px; right: 20px; z-index: 10000; }
+        .ore-toast {
+            background: rgba(0, 0, 0, 0.8); border: 2px solid #FFFFFF;
+            padding: 10px 20px; margin-bottom: 10px; animation: slideIn 0.3s ease-out;
+        }
+        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
 
+        @media (max-width: 768px) { .grid { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
@@ -118,84 +138,73 @@
 <div id="toast-container"></div>
 
 <section class="hero">
-    <img src="logo.png" class="logo-img" alt="KourPar">
+    <div class="logo-container">
+        <img src="logo.png" class="logo-img" alt="KourPar">
+    </div>
 </section>
 
 <div class="grid">
-    <div class="card">
-        <h3>开发计划</h3>
-        <p style="color: #aaa; font-size: 14px;">点击按钮以触发按钮音效。</p>
-        <button class="ore-button green" onclick="handleBtnClick('https://shivr-dev.github.io/ideas/')">进入实验室</button>
+    <div class="ore_panel">
+        <h3 style="margin: 0 0 10px 0;">开发计划</h3>
+        <img src="progress.png" style="width: 100%; height: 150px; object-fit: cover; border: 2px solid #000; margin-bottom: 10px;">
+        <a href="https://shivr-dev.github.io/ideas/" class="button green_button" onclick="playSfx('snd-button')">进入实验室</a>
     </div>
-    <div class="card">
-        <h3>联系信息</h3>
-        <p style="color: #aaa; font-size: 14px;">打开菜单将触发 Drawer Open 音效。</p>
-        <button class="ore-button" onclick="openDrawer()">查看联系方式</button>
+
+    <div class="ore_panel">
+        <h3 style="margin: 0 0 10px 0;">工作室成员</h3>
+        <div style="height: 150px; background: #222; display: flex; align-items: center; justify-content: center; font-size: 40px; border: 2px solid #000; margin-bottom: 10px;">
+            ✉️
+        </div>
+        <button class="button" onclick="openDrawer()">查看联系方式</button>
     </div>
 </div>
 
 <div id="contactModal" class="modal-overlay">
     <div class="modal-window">
-        <h2 style="margin-top:0;">工作室成员</h2>
-        <div style="line-height: 2; border-left: 4px solid var(--ore-btn-green); padding-left: 15px;">
+        <h3 style="margin-top:0;">负责人 ID</h3>
+        <div style="line-height: 2.2; border-left: 4px solid var(--ore-green-bg); padding-left: 15px; color: #ccc;">
             • Shivr_toast<br>• 闲逛九头虫划水<br>• Infrato
         </div>
         <br>
-        <button class="ore-button green" onclick="closeDrawer()">返回并关闭</button>
+        <button class="button green_button" onclick="closeDrawer()">确定</button>
     </div>
 </div>
 
 <script>
-    // 统一音效播放器
     function playSfx(id) {
         const sfx = document.getElementById(id);
-        if (sfx) {
-            sfx.currentTime = 0;
-            sfx.play();
-        }
+        if (sfx) { sfx.currentTime = 0; sfx.play(); }
     }
 
-    // 普通按钮点击
-    function handleBtnClick(url) {
-        playSfx('snd-button');
-        setTimeout(() => { window.location.href = url; }, 150);
-    }
-
-    // 开启内菜单 (Drawer Open)
     function openDrawer() {
         playSfx('snd-open');
         document.getElementById('contactModal').classList.add('active');
-        // 同时触发一个消息 Pop
-        setTimeout(() => { playSfx('snd-pop'); }, 200);
+        setTimeout(() => { playSfx('snd-pop'); }, 150);
     }
 
-    // 关闭内菜单 (Drawer Close)
     function closeDrawer() {
         playSfx('snd-close');
         document.getElementById('contactModal').classList.remove('active');
     }
 
-    // 示例：触发 Toast
     function showToast(msg) {
         playSfx('snd-toast');
-        const container = document.getElementById('toast-container');
         const t = document.createElement('div');
-        t.className = 'ore-toast';
-        t.innerText = msg;
-        container.appendChild(t);
+        t.className = 'ore-toast'; t.innerText = msg;
+        document.getElementById('toast-container').appendChild(t);
         setTimeout(() => { t.remove(); }, 3000);
     }
 
-    // 页面普通点击监听
+    // 全局点击触发 sounds_click
     document.addEventListener('mousedown', (e) => {
-        if (e.target.tagName !== 'BUTTON' && e.target.tagName !== 'A') {
+        // 如果点的不是按钮，就播 click
+        if (!e.target.classList.contains('button')) {
             playSfx('snd-click');
         }
     });
 
-    // 模拟一个开场 Toast
     window.onload = () => {
-        setTimeout(() => { showToast("欢迎访问 Shivr-dev Studio！"); }, 1000);
+        setTimeout(() => { showToast("欢迎访问 Shivr-dev Studio！"); }, 800);
     };
 </script>
 
