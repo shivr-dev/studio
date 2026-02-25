@@ -3,179 +3,200 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shivr-dev Studio | 官方网站</title>
+    <title>Shivr-dev Studio | Ore UI 交互版</title>
     <style>
         :root {
-            /* 严格参考截图颜色 */
-            --ore-bg-dark: #313131;
-            --ore-btn-grey: #cecece;
-            --ore-btn-green: #487931;
-            --ore-text-light: #f1f1f1;
-            --ore-border: #000000;
+            /* 严格参考 oreui.css.txt 变量 */
+            --ore-btn-bg: #CECECE;
+            --ore-btn-green: #6CC349;
+            --ore-btn-border: #1E1E1F;
+            --ore-btn-shadow: #9E9E9E;
+            --ore-btn-shadow-green: #47892B;
+            --ore-panel-bg: #313233;
         }
 
         body {
             margin: 0; padding: 0;
-            font-family: "Microsoft YaHei", sans-serif;
             background-color: #1a1a1a;
-            color: var(--ore-text-light);
+            color: #FFFFFF;
+            font-family: "Microsoft YaHei", sans-serif;
             overflow-x: hidden;
         }
 
-        /* --- 导航栏 --- */
-        nav {
-            background: #212121; height: 50px;
-            display: flex; align-items: center; padding: 0 30px;
-            border-bottom: 2px solid var(--ore-border);
-            font-weight: bold; font-size: 18px;
-        }
-
-        /* --- Hero 区域与 Logo 动画 --- */
+        /* --- 动态 Logo 动画 --- */
         .hero {
-            position: relative; height: 65vh;
+            height: 50vh;
             display: flex; align-items: center; justify-content: center;
-            background: url('hero-bg.png') no-repeat center center; /* 第一张图 */
+            background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('hero-bg.png') no-repeat center center;
             background-size: cover;
             border-bottom: 4px solid var(--ore-btn-green);
         }
-        .hero::before {
-            content: ''; position: absolute; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.3);
-        }
 
-        /* 修复后的浮动动画 */
         .logo-img {
-            position: relative; z-index: 10;
-            max-width: 480px;
-            filter: drop-shadow(0 8px 15px rgba(0,0,0,0.5));
-            animation: oreFloat 4s ease-in-out infinite; /* */
+            max-width: 450px;
+            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.8));
+            animation: oreFloating 3.5s ease-in-out infinite;
         }
 
-        @keyframes oreFloat {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-25px); }
+        @keyframes oreFloating {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(1deg); }
         }
 
-        /* --- Ore UI 核心按钮样式 --- */
-        .ore-button-group {
-            display: flex; gap: 4px; margin-top: 15px;
-        }
-
-        .ore-btn {
-            flex: 1;
+        /* --- Ore UI 按钮样式 --- */
+        .ore-button {
             position: relative;
-            height: 44px;
-            border: 2px solid var(--ore-border);
-            background: var(--ore-btn-grey);
-            color: #333;
+            background-color: var(--ore-btn-bg);
+            border: 2px solid var(--ore-btn-border);
+            box-shadow: inset 0 -4px var(--ore-btn-shadow);
+            color: #1E1E1F;
             font-size: 16px; font-weight: bold;
+            padding: 12px 24px;
             cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
-            /* 内边框高光与底部阴影 */
-            box-shadow: inset 2px 2px 0 rgba(255,255,255,0.4), inset -2px -2px 0 rgba(0,0,0,0.2);
-            transition: all 0.1s;
+            transition: all 0.05s;
+            display: inline-flex; align-items: center; justify-content: center;
+            text-decoration: none;
+            width: 100%; box-sizing: border-box;
         }
 
-        /* 模拟截图中的绿色选中态 */
-        .ore-btn.active {
-            background: var(--ore-btn-green);
-            color: white;
-        }
-        
-        /* 选中态底部的白色亮条 */
-        .ore-btn.active::after {
-            content: '';
-            position: absolute; bottom: 4px; left: 15%; width: 70%; height: 2px;
-            background: white;
+        .ore-button.green {
+            background-color: var(--ore-btn-green);
+            box-shadow: inset 0 -4px var(--ore-btn-shadow-green);
+            color: #FFFFFF;
         }
 
-        .ore-btn:hover { filter: brightness(1.1); }
-        .ore-btn:active { transform: scale(0.98); }
-
-        /* --- 内容板块 --- */
-        .main-content { padding: 50px 20px; background: #2b2b2b; display: flex; justify-content: center; }
-        .grid { max-width: 900px; width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-
-        .ore-panel {
-            background: var(--ore-bg-dark);
-            border: 2px solid var(--ore-border);
-            padding: 20px;
+        .ore-button:hover { border-color: #FFFFFF; }
+        .ore-button:active {
+            transform: translateY(2px);
+            box-shadow: none;
         }
 
-        .panel-title { font-size: 14px; color: #aaa; margin-bottom: 10px; }
+        /* --- 消息提示 (Toast) 样式 --- */
+        #toast-container {
+            position: fixed; top: 20px; right: 20px; z-index: 10000;
+        }
+        .ore-toast {
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #555;
+            padding: 12px 20px;
+            margin-bottom: 10px;
+            animation: slideIn 0.3s ease-out;
+        }
 
-        /* --- 弹窗样式 --- */
+        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+
+        /* --- 弹窗与抽屉逻辑 --- */
         .modal-overlay {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center;
+            display: none; position: fixed; top:0; left:0; width:100%; height:100%;
+            background: rgba(0,0,0,0.8); z-index: 9999;
+            align-items: center; justify-content: center;
         }
         .modal-overlay.active { display: flex; }
 
         .modal-window {
-            background: var(--ore-bg-dark);
-            border: 2px solid #555;
-            width: 400px;
+            background: var(--ore-panel-bg);
+            border: 2px solid #FFFFFF;
+            width: 400px; padding: 25px;
+            box-shadow: 0 0 30px rgba(0,0,0,1);
         }
-        
-        .modal-header { padding: 15px; background: #3c3c3c; border-bottom: 2px solid #000; font-weight: bold; }
-        .modal-body { padding: 25px; line-height: 2; }
-        .modal-footer { padding: 15px; text-align: right; }
 
-        @media (max-width: 768px) { .grid { grid-template-columns: 1fr; } }
+        /* --- 布局 --- */
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; max-width: 900px; margin: 40px auto; padding: 0 20px; }
+        .card { background: var(--ore-panel-bg); border: 2px solid var(--ore-btn-border); padding: 15px; }
+
     </style>
 </head>
 <body>
 
-<nav>SHIVR-DEV STUDIO</nav>
+<audio id="snd-click" src="sounds_click.ogg"></audio>
+<audio id="snd-button" src="sounds_button.ogg"></audio>
+<audio id="snd-toast" src="toast.ogg"></audio>
+<audio id="snd-pop" src="pop.ogg"></audio>
+<audio id="snd-open" src="sounds_drawer_open.ogg"></audio>
+<audio id="snd-close" src="sounds_drawer_close.ogg"></audio>
+
+<div id="toast-container"></div>
 
 <section class="hero">
-    <img src="logo.png" alt="KourPar" class="logo-img"> </section>
+    <img src="logo.png" class="logo-img" alt="KourPar">
+</section>
 
-<div class="main-content">
-    <div class="grid">
-        <div class="ore-panel">
-            <div class="panel-title">开发进展</div>
-            <img src="progress.png" style="width: 100%; height: 120px; object-fit: cover; border: 2px solid #000;" alt="Track"> <div class="ore-button-group">
-                <a href="https://shivr-dev.github.io/ideas/" style="text-decoration:none; width:100%;">
-                    <button class="ore-btn active">进入想法实验室</button>
-                </a>
-            </div>
-        </div>
-
-        <div class="ore-panel">
-            <div class="panel-title">工作室联系</div>
-            <div style="height: 120px; background: #1a1a1a; border: 2px solid #000; display: flex; align-items: center; justify-content: center; font-size: 40px;">✉️</div>
-            <div class="ore-button-group">
-                <button class="ore-btn" onclick="toggleModal(true)">点击查看成员</button>
-            </div>
-        </div>
+<div class="grid">
+    <div class="card">
+        <h3>开发计划</h3>
+        <p style="color: #aaa; font-size: 14px;">点击按钮以触发按钮音效。</p>
+        <button class="ore-button green" onclick="handleBtnClick('https://shivr-dev.github.io/ideas/')">进入实验室</button>
+    </div>
+    <div class="card">
+        <h3>联系信息</h3>
+        <p style="color: #aaa; font-size: 14px;">打开菜单将触发 Drawer Open 音效。</p>
+        <button class="ore-button" onclick="openDrawer()">查看联系方式</button>
     </div>
 </div>
 
-<div id="contactModal" class="modal-overlay" onclick="toggleModal(false)">
-    <div class="modal-window" onclick="event.stopPropagation()">
-        <div class="modal-header">联系方式 - 网易版</div>
-        <div class="modal-body">
-            • <span style="color: #6fb24c;">Shivr_toast</span><br>
-            • <span style="color: #6fb24c;">闲逛九头虫划水</span><br>
-            • <span style="color: #6fb24c;">Infrato</span>
+<div id="contactModal" class="modal-overlay">
+    <div class="modal-window">
+        <h2 style="margin-top:0;">工作室成员</h2>
+        <div style="line-height: 2; border-left: 4px solid var(--ore-btn-green); padding-left: 15px;">
+            • Shivr_toast<br>• 闲逛九头虫划水<br>• Infrato
         </div>
-        <div class="modal-footer">
-            <button class="ore-btn" onclick="toggleModal(false)" style="width: 80px; height: 36px; margin-left: auto;">确定</button>
-        </div>
+        <br>
+        <button class="ore-button green" onclick="closeDrawer()">返回并关闭</button>
     </div>
 </div>
-
-<footer style="text-align: center; color: #444; padding: 40px; font-size: 12px;">
-    © 2026 Shivr-dev Studio. 所有视觉资源参考网易版 Minecraft UI.
-</footer>
 
 <script>
-    function toggleModal(show) {
-        const modal = document.getElementById('contactModal');
-        if (show) modal.classList.add('active');
-        else modal.classList.remove('active');
+    // 统一音效播放器
+    function playSfx(id) {
+        const sfx = document.getElementById(id);
+        if (sfx) {
+            sfx.currentTime = 0;
+            sfx.play();
+        }
     }
+
+    // 普通按钮点击
+    function handleBtnClick(url) {
+        playSfx('snd-button');
+        setTimeout(() => { window.location.href = url; }, 150);
+    }
+
+    // 开启内菜单 (Drawer Open)
+    function openDrawer() {
+        playSfx('snd-open');
+        document.getElementById('contactModal').classList.add('active');
+        // 同时触发一个消息 Pop
+        setTimeout(() => { playSfx('snd-pop'); }, 200);
+    }
+
+    // 关闭内菜单 (Drawer Close)
+    function closeDrawer() {
+        playSfx('snd-close');
+        document.getElementById('contactModal').classList.remove('active');
+    }
+
+    // 示例：触发 Toast
+    function showToast(msg) {
+        playSfx('snd-toast');
+        const container = document.getElementById('toast-container');
+        const t = document.createElement('div');
+        t.className = 'ore-toast';
+        t.innerText = msg;
+        container.appendChild(t);
+        setTimeout(() => { t.remove(); }, 3000);
+    }
+
+    // 页面普通点击监听
+    document.addEventListener('mousedown', (e) => {
+        if (e.target.tagName !== 'BUTTON' && e.target.tagName !== 'A') {
+            playSfx('snd-click');
+        }
+    });
+
+    // 模拟一个开场 Toast
+    window.onload = () => {
+        setTimeout(() => { showToast("欢迎访问 Shivr-dev Studio！"); }, 1000);
+    };
 </script>
 
 </body>
