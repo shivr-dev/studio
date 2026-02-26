@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shivr-dev Studio | 官方网站</title>
+    <title>Shivr-dev Studio | 官网与招募</title>
     <style>
-        /* --- 严格照抄 oreui.css.txt 的核心样式 --- */
-        
+        /* --- 严格参考 oreui.css.txt 的核心变量 --- */
         :root {
             --ore-btn-bg: #CECECE;
             --ore-btn-border: #1E1E1F;
@@ -15,115 +14,104 @@
             --ore-green-shadow: #47892B;
             --ore-panel-bg: #313233;
             --ore-panel-shadow: #242425;
+            --ore-input-bg: #313233;
         }
 
         body {
             margin: 0; padding: 0;
             background-color: #1a1a1a;
             color: #FFFFFF;
-            font-family: "NotoSans Bold", sans-serif;
+            font-family: "NotoSans Bold", "Microsoft YaHei", sans-serif;
             overflow-x: hidden;
         }
 
-        /* --- 1. 标准按钮 (Button) --- */
-        .button {
-            align-self: center;
-            background-color: var(--ore-btn-bg);
-            border: 2px solid var(--ore-btn-border);
-            box-shadow: inset 0 -4px var(--ore-btn-shadow);
-            box-sizing: border-box;
-            color: #1E1E1F;
-            cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 16px; font-weight: bold;
-            height: 44px;
-            margin: 6px;
-            min-height: 40px;
-            outline: none;
-            padding: 0 10px 4px 10px; /* 初始底部留出 4px 给阴影 */
-            position: relative;
-            text-align: center;
-            text-decoration: none;
-            width: 100%;
+        /* --- 1. 顶部导航与 Hero --- */
+        nav {
+            background: #212121; height: 50px;
+            display: flex; align-items: center; padding: 0 30px;
+            border-bottom: 2px solid var(--ore-btn-border);
+            font-weight: bold;
         }
 
-        /* 悬停：边框变白 */
-        .button:hover {
-            border: 2px solid #FFFFFF;
-        }
-
-        /* 按下：取消阴影，颜色变深，通过内边距实现文字下沉 */
-        .button:active {
-            background-color: #48494A;
-            box-shadow: none;
-            color: #FFFFFF;
-            padding: 4px 10px 0 10px; /* 顶部增加 4px，底部减去 4px，实现下沉感 */
-        }
-
-        /* --- 2. 绿色按钮 (Green Button) --- */
-        .green_button {
-            background-color: var(--ore-green-bg);
-            box-shadow: inset 0 -4px var(--ore-green-shadow);
-            color: #FFFFFF;
-        }
-
-        /* --- 3. 面板容器 (参考 Input 样式实现面板感) --- */
-        .ore_panel {
-            background-color: var(--ore-panel-bg);
-            border: 2px solid var(--ore-btn-border);
-            box-shadow: inset 0 4px var(--ore-panel-shadow);
-            padding: 15px;
-            margin: 10px;
-        }
-
-        /* --- 4. 其它页面布局逻辑 --- */
         .hero {
-            height: 50vh;
+            height: 45vh;
             display: flex; align-items: center; justify-content: center;
-            background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('hero-bg.png') no-repeat center center;
+            background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('hero-bg.png') no-repeat center center;
             background-size: cover;
             border-bottom: 4px solid var(--ore-green-bg);
         }
 
-        .logo-container {
-            animation: oreFloating 3s ease-in-out infinite;
+        .logo-container { animation: oreFloating 3.5s ease-in-out infinite; }
+        .logo-img { max-width: 400px; filter: drop-shadow(0 8px 15px rgba(0,0,0,0.8)); }
+        @keyframes oreFloating { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+
+        /* --- 2. Ore UI 按钮与输入框 (严格对标源码) --- */
+        .button {
+            background-color: var(--ore-btn-bg);
+            border: 2px solid var(--ore-btn-border);
+            box-shadow: inset 0 -4px var(--ore-btn-shadow);
+            color: #1E1E1F; font-size: 16px; font-weight: bold;
+            height: 44px; padding: 0 15px 4px 15px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; text-decoration: none; outline: none; transition: 0.05s;
+        }
+        .button.green {
+            background-color: var(--ore-green-bg);
+            box-shadow: inset 0 -4px var(--ore-green-shadow);
+            color: #FFFFFF;
+        }
+        .button:hover { border-color: #FFFFFF; }
+        .button:active {
+            box-shadow: none; transform: translateY(2px);
+            padding: 4px 15px 0 15px; /* 文字下沉 */
         }
 
-        .logo-img {
-            max-width: 450px;
-            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.8));
+        .input-field {
+            background-color: var(--ore-input-bg);
+            border: 2px solid var(--ore-btn-border);
+            box-shadow: inset 0 4px var(--ore-panel-shadow);
+            color: #FFFFFF; caret-color: var(--ore-green-bg);
+            width: 100%; box-sizing: border-box;
+            padding: 12px; font-size: 15px; outline: none;
+            margin-bottom: 15px;
+        }
+        .input-field:focus { border-color: #666; }
+
+        /* --- 3. 页面布局容器 --- */
+        .main-grid {
+            max-width: 1000px; margin: 30px auto;
+            display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 0 20px;
         }
 
-        @keyframes oreFloating {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-20px); }
+        .ore-panel {
+            background: var(--ore-panel-bg);
+            border: 2px solid var(--ore-btn-border);
+            padding: 20px; box-shadow: inset 0 4px var(--ore-panel-shadow);
         }
 
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; max-width: 900px; margin: 30px auto; }
+        .full-width-panel { grid-column: 1 / -1; }
 
-        /* 弹窗样式 */
+        .panel-title { font-size: 14px; color: #aaa; margin-bottom: 15px; text-transform: uppercase; }
+
+        /* --- 4. 弹窗与 Toast --- */
         .modal-overlay {
             display: none; position: fixed; top:0; left:0; width:100%; height:100%;
-            background: rgba(0,0,0,0.8); z-index: 9999;
-            align-items: center; justify-content: center;
+            background: rgba(0,0,0,0.85); z-index: 9999; align-items: center; justify-content: center;
         }
         .modal-overlay.active { display: flex; }
-
         .modal-window {
-            background: var(--ore-panel-bg);
-            border: 2px solid #FFFFFF;
-            width: 380px; padding: 20px;
-            box-shadow: 0 0 30px rgba(0,0,0,1);
+            background: var(--ore-panel-bg); border: 2px solid #FFF;
+            width: 400px; padding: 25px; box-shadow: 0 0 30px #000;
         }
 
-        #toast-container { position: fixed; top: 20px; right: 20px; z-index: 10000; }
+        #toast-container { position: fixed; top: 20px; right: 20px; z-index: 10001; }
         .ore-toast {
-            background: rgba(0, 0, 0, 0.8); border: 2px solid #FFFFFF;
-            padding: 10px 20px; margin-bottom: 10px; animation: slideIn 0.3s ease-out;
+            background: rgba(0,0,0,0.9); border: 2px solid #FFF;
+            padding: 12px 25px; margin-bottom: 10px; animation: slideIn 0.3s forwards;
         }
-        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+        @keyframes slideIn { from { transform: translateX(120%); } to { transform: translateX(0); } }
 
-        @media (max-width: 768px) { .grid { grid-template-columns: 1fr; } }
+        @media (max-width: 768px) { .main-grid { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
@@ -135,56 +123,90 @@
 <audio id="snd-open" src="sounds_drawer_open.ogg"></audio>
 <audio id="snd-close" src="sounds_drawer_close.ogg"></audio>
 
+<nav>SHIVR-DEV STUDIO</nav>
+
 <div id="toast-container"></div>
 
 <section class="hero">
     <div class="logo-container">
-        <img src="logo.png" class="logo-img" alt="KourPar">
+        <img src="logo.png" class="logo-img" alt="Logo">
     </div>
 </section>
 
-<div class="grid">
-    <div class="ore_panel">
-        <h3 style="margin: 0 0 10px 0;">开发计划</h3>
-        <img src="progress.png" style="width: 100%; height: 150px; object-fit: cover; border: 2px solid #000; margin-bottom: 10px;">
-        <a href="https://shivr-dev.github.io/ideas/" class="button green_button" onclick="playSfx('snd-button')">进入实验室</a>
+<div class="main-grid">
+    <div class="ore-panel">
+        <div class="panel-title">开发进展</div>
+        <img src="progress.png" style="width:100%; height:140px; object-fit:cover; border:2px solid #000; margin-bottom:15px;">
+        <a href="https://shivr-dev.github.io/ideas/" class="button green" onclick="playSfx('snd-button')">查看想法实验室</a>
     </div>
 
-    <div class="ore_panel">
-        <h3 style="margin: 0 0 10px 0;">工作室成员</h3>
-        <div style="height: 150px; background: #222; display: flex; align-items: center; justify-content: center; font-size: 40px; border: 2px solid #000; margin-bottom: 10px;">
-            ✉️
+    <div class="ore-panel">
+        <div class="panel-title">快捷联系</div>
+        <div style="height:140px; background:#222; display:flex; align-items:center; justify-content:center; font-size:50px; border:2px solid #000; margin-bottom:15px;">✉️</div>
+        <button class="button" onclick="toggleModal('contactModal', true)">显示工作室成员</button>
+    </div>
+
+    <div class="ore-panel full-width-panel" id="recruitment-section">
+        <div class="panel-title">开发者招募 (RECRUITMENT)</div>
+        <p style="color:#ccc; font-size:14px; margin-bottom:20px;">填写下方信息申请加入。审核通过后，凭据将发送至你的邮箱。</p>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div>
+                <label style="font-size:12px; display:block; margin-bottom:5px;">游戏 ID (Minecraft ID)</label>
+                <input type="text" id="join-id" class="input-field" placeholder="输入你的 ID..." onfocus="playSfx('snd-click')">
+                
+                <label style="font-size:12px; display:block; margin-bottom:5px;">联系邮箱 (用于接收审核结果)</label>
+                <input type="email" id="join-email" class="input-field" placeholder="example@mail.com" onfocus="playSfx('snd-click')">
+            </div>
+            <div>
+                <label style="font-size:12px; display:block; margin-bottom:5px;">擅长领域 (如：建模、函数、UI、地图设计)</label>
+                <input type="text" id="join-role" class="input-field" placeholder="你最擅长什么？" onfocus="playSfx('snd-click')">
+                
+                <label style="font-size:12px; display:block; margin-bottom:5px;">作品链接/个人简介 (选填)</label>
+                <input type="text" id="join-desc" class="input-field" placeholder="让我们更了解你..." onfocus="playSfx('snd-click')">
+            </div>
         </div>
-        <button class="button" onclick="openDrawer()">查看联系方式</button>
+        
+        <button class="button green" style="width:200px; margin: 10px auto 0;" onclick="submitApplication()">提交申请</button>
     </div>
 </div>
 
 <div id="contactModal" class="modal-overlay">
     <div class="modal-window">
-        <h3 style="margin-top:0;">负责人 ID</h3>
-        <div style="line-height: 2.2; border-left: 4px solid var(--ore-green-bg); padding-left: 15px; color: #ccc;">
+        <h3 style="margin-top:0;">负责人列表</h3>
+        <div style="line-height:2; border-left:4px solid var(--ore-green-bg); padding-left:15px; color:#ddd;">
             • Shivr_toast<br>• 闲逛九头虫划水<br>• Infrato
         </div>
         <br>
-        <button class="button green_button" onclick="closeDrawer()">确定</button>
+        <button class="button" style="width:100px; margin-left:auto;" onclick="toggleModal('contactModal', false)">确定</button>
+    </div>
+</div>
+
+<div id="successModal" class="modal-overlay">
+    <div class="modal-window">
+        <h3 style="margin-top:0; color:var(--ore-green-bg);">申请已发送！</h3>
+        <p id="credential-text" style="font-size:14px; line-height:1.6; background:#222; padding:15px; border:1px solid #444;"></p>
+        <p style="font-size:12px; color:#888;">请保存好上述信息。管理员审核通过（添加 Approved 标签）后，你会收到邮件通知。</p>
+        <button class="button green" style="width:100px; margin-left:auto;" onclick="toggleModal('successModal', false)">明白了</button>
     </div>
 </div>
 
 <script>
+    // 1. 基础交互逻辑
     function playSfx(id) {
         const sfx = document.getElementById(id);
-        if (sfx) { sfx.currentTime = 0; sfx.play(); }
+        if (sfx) { sfx.currentTime = 0; sfx.play().catch(()=>{}); }
     }
 
-    function openDrawer() {
-        playSfx('snd-open');
-        document.getElementById('contactModal').classList.add('active');
-        setTimeout(() => { playSfx('snd-pop'); }, 150);
-    }
-
-    function closeDrawer() {
-        playSfx('snd-close');
-        document.getElementById('contactModal').classList.remove('active');
+    function toggleModal(id, show) {
+        if (show) {
+            playSfx('snd-open');
+            document.getElementById(id).classList.add('active');
+            if(id === 'successModal') setTimeout(()=>playSfx('snd-pop'), 200);
+        } else {
+            playSfx('snd-close');
+            document.getElementById(id).classList.remove('active');
+        }
     }
 
     function showToast(msg) {
@@ -192,19 +214,64 @@
         const t = document.createElement('div');
         t.className = 'ore-toast'; t.innerText = msg;
         document.getElementById('toast-container').appendChild(t);
-        setTimeout(() => { t.remove(); }, 3000);
+        setTimeout(() => t.remove(), 4000);
     }
 
-    // 全局点击触发 sounds_click
+    // 2. 随机密码生成
+    function generatePass(length = 8) {
+        const charset = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+        let ret = "";
+        for (let i = 0; i < length; i++) ret += charset.charAt(Math.floor(Math.random() * charset.length));
+        return ret;
+    }
+
+    // 3. 提交申请逻辑
+    async function submitApplication() {
+        const id = document.getElementById('join-id').value;
+        const email = document.getElementById('join-email').value;
+        const role = document.getElementById('join-role').value;
+        const desc = document.getElementById('join-desc').value;
+
+        if (!id || !email || !role) {
+            showToast("请填写完整必填信息！");
+            return;
+        }
+
+        const password = generatePass();
+        playSfx('snd-button');
+
+        // --- GitHub API 提交部分 ---
+        // 注意：此处需要你后续配置 Token，现在仅展示逻辑
+        const issueData = {
+            title: `[申请] ${id}`,
+            body: `### 开发者申请信息\n\n- **游戏 ID**: ${id}\n- **联系邮箱**: ${email}\n- **擅长领域**: ${role}\n- **个人简介**: ${desc}\n- **生成密码**: ${password}\n\n---\n*由官网招募系统自动生成*`
+        };
+
+        // 模拟提交成功的反馈
+        document.getElementById('credential-text').innerHTML = `<strong>用户名:</strong> ${id}<br><strong>初始密码:</strong> ${password}<br><br><span style="color:#aaa;">(状态：待审核)</span>`;
+        toggleModal('successModal', true);
+
+        /* 将来对接 API 的代码参考：
+        fetch('https://api.github.com/repos/你的用户名/仓库名/issues', {
+            method: 'POST',
+            headers: {
+                'Authorization': 'token YOUR_GITHUB_TOKEN',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(issueData)
+        });
+        */
+    }
+
+    // 全局背景点击声
     document.addEventListener('mousedown', (e) => {
-        // 如果点的不是按钮，就播 click
-        if (!e.target.classList.contains('button')) {
+        if (!['BUTTON', 'INPUT', 'A'].includes(e.target.tagName)) {
             playSfx('snd-click');
         }
     });
 
     window.onload = () => {
-        setTimeout(() => { showToast("欢迎访问 Shivr-dev Studio！"); }, 800);
+        setTimeout(() => showToast("Ore UI 招募系统已就绪。"), 1000);
     };
 </script>
 
