@@ -197,7 +197,7 @@
     const p2 = '9LZtot1qgVw1k1FSQVSSCIDlDlpJqL2rSs2D'; // 请填入有 repo 权限的 token
     const G_TOKEN = p1 + p2; 
     const REPO_OWNER = 'shivr-dev';
-    const REPO_NAME = 'ideas'; // 提交到你的仓库
+    const REPO_NAME = 'ideas-data'; // 提交到你的仓库
     // ================================
 
     // 1. 基础交互逻辑
@@ -260,7 +260,7 @@
         };
 
         try {
-            const res = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/issues`, {
+            const res = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${AUTH_REPO}/issues`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `token ${G_TOKEN}`,
