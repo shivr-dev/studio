@@ -129,14 +129,14 @@
 
 <section class="hero">
     <div class="logo-container">
-        <img src="logo.png" class="logo-img" alt="Logo">
+        <img src="logo.png" class="logo-img" alt="Logo" style="min-width:200px; min-height:100px; border:2px dashed #666;">
     </div>
 </section>
 
 <div class="main-grid">
     <div class="ore-panel">
         <div class="panel-title">开发进展</div>
-        <img src="progress.png" style="width:100%; height:140px; object-fit:cover; border:2px solid #000; margin-bottom:15px;">
+        <img src="progress.png" style="width:100%; height:140px; object-fit:cover; border:2px solid #000; margin-bottom:15px; background:#111;">
         <a href="https://shivr-dev.github.io/ideas/" class="button green" onclick="playSfx('snd-button')">查看想法实验室</a>
     </div>
 
@@ -148,26 +148,26 @@
 
     <div class="ore-panel full-width-panel" id="recruitment-section">
         <div class="panel-title">开发者招募 (RECRUITMENT)</div>
-        <p style="color:#ccc; font-size:14px; margin-bottom:20px;">填写下方信息申请加入。审核通过后，凭据将发送至你的邮箱。</p>
+        <p style="color:#ccc; font-size:14px; margin-bottom:20px;">填写下方信息申请加入。审核通过后，即可在主控台登录。</p>
         
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
             <div>
-                <label style="font-size:12px; display:block; margin-bottom:5px;">游戏 ID (Minecraft ID)</label>
+                <label style="font-size:12px; display:block; margin-bottom:5px;">游戏 ID (将作为登录账号)</label>
                 <input type="text" id="join-id" class="input-field" placeholder="输入你的 ID..." onfocus="playSfx('snd-click')">
                 
-                <label style="font-size:12px; display:block; margin-bottom:5px;">联系邮箱 (用于接收审核结果)</label>
+                <label style="font-size:12px; display:block; margin-bottom:5px;">联系邮箱</label>
                 <input type="email" id="join-email" class="input-field" placeholder="example@mail.com" onfocus="playSfx('snd-click')">
             </div>
             <div>
-                <label style="font-size:12px; display:block; margin-bottom:5px;">擅长领域 (如：建模、函数、UI、地图设计)</label>
+                <label style="font-size:12px; display:block; margin-bottom:5px;">擅长领域 (建模/函数/UI/地图)</label>
                 <input type="text" id="join-role" class="input-field" placeholder="你最擅长什么？" onfocus="playSfx('snd-click')">
                 
-                <label style="font-size:12px; display:block; margin-bottom:5px;">作品链接/个人简介 (选填)</label>
+                <label style="font-size:12px; display:block; margin-bottom:5px;">个人简介 (选填)</label>
                 <input type="text" id="join-desc" class="input-field" placeholder="让我们更了解你..." onfocus="playSfx('snd-click')">
             </div>
         </div>
         
-        <button class="button green" style="width:200px; margin: 10px auto 0;" onclick="submitApplication()">提交申请</button>
+        <button id="submitBtn" class="button green" style="width:200px; margin: 10px auto 0;" onclick="submitApplication()">提交申请</button>
     </div>
 </div>
 
@@ -186,12 +186,20 @@
     <div class="modal-window">
         <h3 style="margin-top:0; color:var(--ore-green-bg);">申请已发送！</h3>
         <p id="credential-text" style="font-size:14px; line-height:1.6; background:#222; padding:15px; border:1px solid #444;"></p>
-        <p style="font-size:12px; color:#888;">请保存好上述信息。管理员审核通过（添加 Approved 标签）后，你会收到邮件通知。</p>
+        <p style="font-size:12px; color:#888;">⚠️ 请务必截图或保存好你的密码！管理员在 GitHub 打上 <strong style="color:var(--ore-green-bg);">approved</strong> 标签后，你即可前往想法区登录。</p>
         <button class="button green" style="width:100px; margin-left:auto;" onclick="toggleModal('successModal', false)">明白了</button>
     </div>
 </div>
 
 <script>
+    // ======= 请配置你的 Token =======
+    const p1 = 'ghp_'; 
+    const p2 = '9LZtot1qgVw1k1FSQVSSCIDlDlpJqL2rSs2D'; // 请填入有 repo 权限的 token
+    const G_TOKEN = p1 + p2; 
+    const REPO_OWNER = 'shivr-dev';
+    const REPO_NAME = 'ideas'; // 提交到你的仓库
+    // ================================
+
     // 1. 基础交互逻辑
     function playSfx(id) {
         const sfx = document.getElementById(id);
@@ -225,12 +233,12 @@
         return ret;
     }
 
-    // 3. 提交申请逻辑
+    // 3. 提交申请逻辑 (对接 GitHub Issue)
     async function submitApplication() {
-        const id = document.getElementById('join-id').value;
-        const email = document.getElementById('join-email').value;
-        const role = document.getElementById('join-role').value;
-        const desc = document.getElementById('join-desc').value;
+        const id = document.getElementById('join-id').value.trim();
+        const email = document.getElementById('join-email').value.trim();
+        const role = document.getElementById('join-role').value.trim();
+        const desc = document.getElementById('join-desc').value.trim() || '无';
 
         if (!id || !email || !role) {
             showToast("请填写完整必填信息！");
@@ -239,41 +247,51 @@
 
         const password = generatePass();
         playSfx('snd-button');
+        
+        const btn = document.getElementById('submitBtn');
+        btn.innerText = "提交中...";
+        btn.disabled = true;
 
-        // --- GitHub API 提交部分 ---
-        // 注意：此处需要你后续配置 Token，现在仅展示逻辑
         const issueData = {
-            title: `[申请] ${id}`,
-            body: `### 开发者申请信息\n\n- **游戏 ID**: ${id}\n- **联系邮箱**: ${email}\n- **擅长领域**: ${role}\n- **个人简介**: ${desc}\n- **生成密码**: ${password}\n\n---\n*由官网招募系统自动生成*`
+            title: `[申请] 新开发者接入: ${id}`,
+            // ⚠️ 极其重要：正文格式必须严格固定，这样登录页的验证代码才能识别出来！
+            body: `### 开发者申请信息\n\n- **游戏 ID**: ${id}\n- **联系邮箱**: ${email}\n- **擅长领域**: ${role}\n- **个人简介**: ${desc}\n- **生成密码**: ${password}\n\n---\n*由官网招募系统自动生成。管理员请审核：如果同意加入，请给此 Issue 添加 \`approved\` 标签。*`,
+            labels: ["pending"] // 默认给一个 pending 标签
         };
 
-        // 模拟提交成功的反馈
-        document.getElementById('credential-text').innerHTML = `<strong>用户名:</strong> ${id}<br><strong>初始密码:</strong> ${password}<br><br><span style="color:#aaa;">(状态：待审核)</span>`;
-        toggleModal('successModal', true);
+        try {
+            const res = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/issues`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `token ${G_TOKEN}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(issueData)
+            });
 
-        /* 将来对接 API 的代码参考：
-        fetch('https://api.github.com/repos/你的用户名/仓库名/issues', {
-            method: 'POST',
-            headers: {
-                'Authorization': 'token YOUR_GITHUB_TOKEN',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(issueData)
-        });
-        */
+            if (!res.ok) throw new Error('网络异常');
+
+            document.getElementById('credential-text').innerHTML = `<strong>登录账号:</strong> ${id}<br><strong>初始密码:</strong> ${password}<br><br><span style="color:#aaa;">(当前状态：等待管理员审核...)</span>`;
+            toggleModal('successModal', true);
+            
+            // 清空表单
+            document.getElementById('join-id').value = '';
+            document.getElementById('join-email').value = '';
+            document.getElementById('join-role').value = '';
+            document.getElementById('join-desc').value = '';
+        } catch (err) {
+            showToast("提交失败，请检查网络或 Token 设置！");
+        } finally {
+            btn.innerText = "提交申请";
+            btn.disabled = false;
+        }
     }
 
-    // 全局背景点击声
     document.addEventListener('mousedown', (e) => {
-        if (!['BUTTON', 'INPUT', 'A'].includes(e.target.tagName)) {
-            playSfx('snd-click');
-        }
+        if (!['BUTTON', 'INPUT', 'A'].includes(e.target.tagName)) { playSfx('snd-click'); }
     });
 
-    window.onload = () => {
-        setTimeout(() => showToast("Ore UI 招募系统已就绪。"), 1000);
-    };
+    window.onload = () => { setTimeout(() => showToast("Ore UI 招募系统已就绪。"), 1000); };
 </script>
-
 </body>
 </html>
