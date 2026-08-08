@@ -4,6 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shivr-dev Studio | 官网与招募</title>
+
+    <!-- ===== BL 风格字体:拉丁用 Passion One(在线),中/日用本地字体文件 ===== -->
+    <link href="https://fonts.googleapis.com/css2?family=Passion+One:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        @font-face {
+            font-family: 'BLZh';
+            src: url('ZiZhiQuXiMaiTi-2.ttf') format('truetype');
+            font-display: swap;
+        }
+        @font-face {
+            font-family: 'BLJa';
+            src: url('GenEiPOPle-Bk.ttf') format('truetype');
+            font-display: swap;
+        }
+    </style>
+
     <style>
         /* --- 严格参考 oreui.css.txt 的核心变量 --- */
         :root {
@@ -54,6 +70,7 @@
             height: 44px; padding: 0 15px 4px 15px;
             display: flex; align-items: center; justify-content: center;
             cursor: pointer; text-decoration: none; outline: none; transition: 0.05s;
+            box-sizing: border-box;
         }
         .button.green {
             background-color: var(--ore-green-bg);
@@ -113,8 +130,372 @@
 
         @media (max-width: 768px) { .main-grid { grid-template-columns: 1fr; } }
     </style>
+
+    <style>
+        /* ============================================================
+           以下为新增:切换器 + BL(Block Legends)主题
+           色值严格取自品牌设计文档:
+           Gold Yellow #FFD829 / Royal Red #E0262C / Plastic Blue #3C69F0
+           Off-Black #09090A / Ink Black #1D3055 / Off-White #FCFCFC
+           ============================================================ */
+        :root {
+            --bl-gold: #FFD829;
+            --bl-red: #E0262C;
+            --bl-blue: #3C69F0;
+            --bl-offblack: #09090A;
+            --bl-ink: #1D3055;
+            --bl-offwhite: #FCFCFC;
+            --bl-gold-shadow: #C9A512;
+            --bl-red-shadow: #9E171C;
+        }
+
+        /* --- 导航右侧切换器 --- */
+        .nav-brand { display: flex; align-items: center; gap: 10px; }
+        #nav-icon { display: none; height: 34px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6)); }
+        .nav-controls { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+        .nav-controls .button { height: 30px; font-size: 12px; padding: 0 10px 3px 10px; }
+        .nav-controls .button:active { padding: 3px 10px 0 10px; }
+        .nav-divider { width: 2px; height: 22px; background: #555; margin: 0 4px; }
+        .switcher-active { outline: 2px solid #FFF; outline-offset: 1px; }
+
+        /* --- 页脚 --- */
+        footer {
+            max-width: 1000px; margin: 0 auto 40px; padding: 20px;
+            display: flex; align-items: center; gap: 12px;
+            color: #888; font-size: 12px;
+        }
+        #footer-icon { display: none; height: 40px; }
+
+        /* ============ BL 主题覆写 ============ */
+        body.theme-bl {
+            background-color: var(--bl-offblack);
+            color: var(--bl-offwhite);
+        }
+
+        /* 标题字体:英文 Passion One / 中文 BLZh / 日语 BLJa,正文沿用 Noto Sans */
+        body.theme-bl .bl-hl { font-family: 'Passion One', 'BLZh', 'BLJa', sans-serif; text-transform: uppercase; letter-spacing: 2px; }
+        body.theme-bl.lang-zh .bl-hl { font-family: 'BLZh', 'Passion One', sans-serif; letter-spacing: 4px; }
+        body.theme-bl.lang-ja .bl-hl { font-family: 'BLJa', 'Passion One', sans-serif; letter-spacing: 2px; }
+
+        body.theme-bl nav {
+            background: var(--bl-offblack);
+            border-bottom: 4px solid var(--bl-gold);
+            color: var(--bl-gold);
+        }
+        body.theme-bl #nav-icon { display: block; }
+
+        body.theme-bl .hero {
+            background: linear-gradient(rgba(9,9,10,0.12), rgba(9,9,10,0.28)), url('assets/bl-keyart.png') no-repeat center center;
+            background-size: cover;
+            border-bottom: 4px solid var(--bl-gold);
+        }
+
+        body.theme-bl .button {
+            background-color: var(--bl-gold);
+            border: 3px solid var(--bl-offblack);
+            box-shadow: inset 0 -4px var(--bl-gold-shadow);
+            color: var(--bl-offblack);
+            font-family: 'Passion One', 'BLZh', 'BLJa', sans-serif;
+            text-transform: uppercase; letter-spacing: 1.5px;
+            font-size: 17px; border-radius: 0;
+        }
+        body.theme-bl.lang-zh .button { font-family: 'BLZh', 'Passion One', sans-serif; }
+        body.theme-bl.lang-ja .button { font-family: 'BLJa', 'Passion One', sans-serif; }
+        body.theme-bl .button.green { /* BL 中的主按钮 = Royal Red */
+            background-color: var(--bl-red);
+            box-shadow: inset 0 -4px var(--bl-red-shadow);
+            color: var(--bl-offwhite);
+        }
+        body.theme-bl .button:hover { border-color: var(--bl-offwhite); }
+
+        body.theme-bl .ore-panel {
+            background: var(--bl-offwhite);
+            border: 3px solid #1E1E1F;
+            box-shadow: 8px 8px 0 rgba(0,0,0,0.85);
+            color: #1E1E1F;
+        }
+        body.theme-bl .panel-title { color: var(--bl-red); font-size: 20px; }
+
+        body.theme-bl .input-field {
+            background-color: #FFFFFF;
+            border: 3px solid #1E1E1F;
+            box-shadow: inset 0 4px rgba(0,0,0,0.1);
+            color: #1E1E1F;
+            caret-color: var(--bl-red);
+        }
+        body.theme-bl .input-field:focus { border-color: var(--bl-red); }
+
+        body.theme-bl .modal-window {
+            background: var(--bl-offwhite);
+            border: 3px solid #1E1E1F;
+            box-shadow: 10px 10px 0 rgba(0,0,0,0.85);
+            color: #1E1E1F;
+        }
+        body.theme-bl .modal-window h3 { color: var(--bl-red); }
+        body.theme-bl .modal-window .accent-line { color: #333 !important; }
+        body.theme-bl #m2_title { color: var(--bl-red) !important; }
+        body.theme-bl #credential-text { background: #FFF !important; border: 2px solid #1E1E1F !important; color: #1E1E1F !important; }
+
+        body.theme-bl .ore-toast {
+            background: var(--bl-offblack);
+            border: 3px solid var(--bl-gold);
+            color: var(--bl-gold);
+            font-family: 'Passion One', 'BLZh', 'BLJa', sans-serif;
+            text-transform: uppercase; letter-spacing: 1px;
+        }
+
+        body.theme-bl footer {
+            max-width: none; margin: 0; padding: 28px 40px;
+            background: var(--bl-offblack); color: var(--bl-gold);
+            justify-content: center; font-size: 14px;
+        }
+        body.theme-bl #footer-icon { display: block; }
+
+        .theme-bl .accent-gold { color: var(--bl-gold); }
+        .theme-bl .accent-line { border-left-color: var(--bl-red) !important; }
+
+        /* ============ BL 专属区块(Ore 主题下隐藏) ============ */
+        .bl-only { display: none; }
+        body.theme-bl .bl-only { display: block; }
+        body.theme-bl .hero { height: 55vh; }
+
+        /* 服务器 IP 金色横幅 */
+        .bl-ipbar {
+            display: none;
+            background: var(--bl-gold);
+            border-bottom: 4px solid var(--bl-offblack);
+            padding: 14px 30px;
+            align-items: center; justify-content: center; gap: 25px; flex-wrap: wrap;
+            color: var(--bl-offblack);
+        }
+        body.theme-bl .bl-ipbar { display: flex; }
+        .bl-ipbar .ip-label { font-size: 15px; opacity: 0.75; }
+        .bl-ipbar .ip-value { font-size: 32px; letter-spacing: 3px; text-shadow: 2px 2px 0 rgba(255,255,255,0.5); }
+        .bl-ipbar .button { height: 38px; font-size: 15px; }
+
+        /* 大字号赛事宣言 */
+        .bl-intro { max-width: 1000px; margin: 0 auto; padding: 60px 20px 10px; text-align: center; }
+        .bl-intro h1 {
+            font-size: clamp(42px, 6vw, 78px); margin: 0 0 22px; line-height: 1.1;
+            color: var(--bl-red); text-shadow: 5px 5px 0 var(--bl-gold);
+        }
+        .bl-intro p { max-width: 780px; margin: 0 auto; font-size: 17px; line-height: 1.9; color: #3A3A3A; }
+
+        /* 区块标题 */
+        .bl-section { max-width: 1000px; margin: 0 auto; padding: 45px 20px 10px; }
+        .bl-section > h2 {
+            text-align: center; font-size: clamp(28px, 4vw, 46px);
+            color: #1E1E1F; margin: 10px 0 34px;
+            text-shadow: 3px 3px 0 rgba(255,216,41,0.65);
+        }
+
+        /* 小游戏卡片:歪斜重叠拼贴 */
+        .game-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; align-items: start; }
+        .game-card {
+            --tilt: rotate(0deg);
+            background: var(--bl-offwhite);
+            border: 3px solid #1E1E1F;
+            padding: 24px;
+        }
+        body.theme-bl .game-card:nth-child(1) { --tilt: rotate(-3deg);   margin-top: 34px; }
+        body.theme-bl .game-card:nth-child(2) { --tilt: rotate(2.2deg); z-index: 3; }
+        body.theme-bl .game-card:nth-child(3) { --tilt: rotate(-1.6deg); margin-top: 48px; margin-left: -14px; }
+        body.theme-bl .game-card:nth-child(4) { --tilt: rotate(1.8deg);  margin-top: -14px; margin-right: -10px; z-index: 2; }
+        body.theme-bl .game-card:nth-child(5) { --tilt: rotate(-2.4deg); margin-top: 14px; z-index: 4; }
+        body.theme-bl .game-card:nth-child(6) { --tilt: rotate(3deg);    margin-top: -6px; margin-left: -16px; }
+        .game-card:nth-child(3n+1) { box-shadow: inset 0 6px var(--bl-gold), 7px 7px 0 rgba(0,0,0,0.85); }
+        .game-card:nth-child(3n+2) { box-shadow: inset 0 6px var(--bl-red), 7px 7px 0 rgba(0,0,0,0.85); }
+        .game-card:nth-child(3n)   { box-shadow: inset 0 6px var(--bl-blue), 7px 7px 0 rgba(0,0,0,0.85); }
+        .game-icon {
+            width: 74px; height: 74px; margin-bottom: 16px;
+            background: var(--bl-offblack); border: 3px solid var(--bl-gold);
+            display: flex; align-items: center; justify-content: center; font-size: 38px;
+        }
+        .game-title { font-size: 26px; color: #1E1E1F; margin-bottom: 8px; }
+        .game-desc { font-size: 14px; line-height: 1.7; color: #4A4A4A; }
+
+        /* 赛季赛制 */
+        .step-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+        .step-card {
+            --tilt: rotate(0deg);
+            background: var(--bl-offwhite); border: 3px solid #1E1E1F;
+            box-shadow: 7px 7px 0 rgba(0,0,0,0.85);
+            padding: 24px; text-align: center;
+        }
+        body.theme-bl .step-card:nth-child(1) { --tilt: rotate(-1.6deg); }
+        body.theme-bl .step-card:nth-child(2) { --tilt: rotate(1.3deg); margin-top: 14px; }
+        body.theme-bl .step-card:nth-child(3) { --tilt: rotate(-1deg); }
+        .step-num {
+            font-family: 'Passion One', 'BLZh', 'BLJa', sans-serif;
+            font-size: 58px; color: var(--bl-red); line-height: 1;
+        }
+        body.theme-bl.lang-zh .step-num { font-family: 'BLZh', 'Passion One', sans-serif; }
+        body.theme-bl.lang-ja .step-num { font-family: 'BLJa', 'Passion One', sans-serif; }
+        .step-title { font-size: 22px; color: #1E1E1F; margin: 10px 0; }
+        .step-desc { font-size: 13px; line-height: 1.7; color: #4A4A4A; }
+
+        /* BL 布局重排:招募卡第一(红底 CTA),日历/联系并排 */
+        body.theme-bl #recruitment-section { order: -1; }
+        body.theme-bl #p1-img { height: 240px; }
+        body.theme-bl #p2-emoji { width: 300px; margin-left: auto; margin-right: auto; }
+        body.theme-bl .main-grid > .ore-panel:nth-child(2) .button { width: 240px; margin: 0 auto; }
+        body.theme-bl #recruitment-section { background: var(--bl-red); color: var(--bl-offwhite); }
+        body.theme-bl #recruitment-section .panel-title { color: var(--bl-gold); }
+        body.theme-bl #recruitment-section [data-key="rec_desc"] { color: rgba(255,255,255,0.92) !important; }
+        body.theme-bl #submitBtn {
+            background: var(--bl-gold); color: var(--bl-offblack);
+            box-shadow: inset 0 -4px var(--bl-gold-shadow);
+        }
+
+        @media (max-width: 768px) {
+            .game-grid, .step-grid { grid-template-columns: 1fr; }
+            .bl-ipbar .ip-value { font-size: 22px; }
+        }
+
+        /* ============ BL 炫酷动效层(MCC 式 Q 弹动画) ============ */
+        /* 亮色基底,色带之间的缝隙露浅色 */
+        body.theme-bl { background: #E7EBF4; }
+
+        /* 彩色通栏色带 */
+        body.theme-bl .band { padding: 75px 20px; }
+        body.theme-bl .band > .bl-intro, body.theme-bl .band > .bl-section { padding: 0; }
+        body.theme-bl .band-white { background: var(--bl-offwhite); }
+        body.theme-bl .band-gold {
+            background: var(--bl-gold);
+            border-top: 4px solid var(--bl-offblack); border-bottom: 4px solid var(--bl-offblack);
+        }
+        body.theme-bl .band-red {
+            background: var(--bl-red); padding: 50px 20px;
+            border-bottom: 4px solid var(--bl-offblack);
+        }
+        body.theme-bl .band-blue {
+            background: var(--bl-blue);
+            border-bottom: 4px solid var(--bl-offblack);
+        }
+        body.theme-bl .band-gold .bl-section > h2 { text-shadow: 3px 3px 0 rgba(255,255,255,0.5); }
+        body.theme-bl .band-blue .bl-section > h2 { color: var(--bl-offwhite); text-shadow: 3px 3px 0 rgba(0,0,0,0.45); }
+
+        /* 导航加大 */
+        body.theme-bl nav { height: 60px; }
+        body.theme-bl #nav-icon { height: 44px; }
+        body.theme-bl #nav-title { font-size: 24px; letter-spacing: 3px; }
+
+        /* Hero:Q 弹入场 + 滚动提示 */
+        body.theme-bl .hero { position: relative; }
+        body.theme-bl .logo-img { max-width: min(480px, 78vw); }
+        body.theme-bl .logo-container {
+            animation: blHeroIn 1s cubic-bezier(.34,1.56,.64,1) both, oreFloating 3.5s ease-in-out 1s infinite;
+        }
+        @keyframes blHeroIn {
+            from { opacity: 0; transform: scale(0.5) translateY(70px) rotate(-6deg); }
+            to   { opacity: 1; transform: scale(1) translateY(0) rotate(0deg); }
+        }
+        .scroll-cue {
+            display: none; position: absolute; bottom: 16px; left: 50%;
+            color: var(--bl-gold); font-size: 26px;
+            animation: cueBounce 1.6s ease-in-out infinite;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.8);
+        }
+        body.theme-bl .scroll-cue { display: block; }
+        @keyframes cueBounce {
+            0%, 100% { transform: translate(-50%, 0); opacity: 0.9; }
+            50% { transform: translate(-50%, 12px); opacity: 0.4; }
+        }
+
+        /* 倾斜跑马灯缎带 */
+        .marquee {
+            display: none; overflow: hidden; white-space: nowrap;
+            border-top: 4px solid var(--bl-offblack); border-bottom: 4px solid var(--bl-offblack);
+            padding: 10px 0;
+        }
+        body.theme-bl .marquee { display: block; }
+        .mq-gold { background: var(--bl-gold); color: var(--bl-offblack); transform: rotate(-1.2deg) scale(1.03); margin: 30px -12px; }
+        .mq-red  { background: var(--bl-red); color: var(--bl-offwhite); transform: rotate(1.2deg) scale(1.03); margin: 30px -12px; }
+        .marquee-inner { display: inline-flex; animation: mqScroll 22s linear infinite; will-change: transform; }
+        .marquee-inner span {
+            font-family: 'Passion One', 'BLZh', 'BLJa', sans-serif;
+            font-size: 26px; letter-spacing: 3px; text-transform: uppercase; padding-right: 30px;
+        }
+        body.theme-bl.lang-zh .marquee-inner span { font-family: 'BLZh', 'Passion One', sans-serif; }
+        body.theme-bl.lang-ja .marquee-inner span { font-family: 'BLJa', 'Passion One', sans-serif; }
+        @keyframes mqScroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+        /* 数字统计条(红色带) */
+        .bl-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; text-align: center; }
+        .stat-num {
+            font-size: clamp(48px, 7vw, 86px); line-height: 1;
+            color: var(--bl-gold); text-shadow: 4px 4px 0 rgba(0,0,0,0.55);
+        }
+        .stat-label { margin-top: 8px; font-size: 13px; letter-spacing: 2px; color: rgba(255,255,255,0.9); text-transform: uppercase; }
+
+        /* Q 弹滚动显现(仅 BL 预隐藏,Ore 不受影响) */
+        body.theme-bl .bl-intro, body.theme-bl .bl-section > h2,
+        body.theme-bl .main-grid .ore-panel, body.theme-bl .stat-item {
+            opacity: 0; transform: translateY(60px) scale(0.85);
+            transition: opacity 0.5s ease, transform 0.65s cubic-bezier(.34,1.56,.64,1);
+        }
+        body.theme-bl .bl-intro.revealed, body.theme-bl .bl-section > h2.revealed,
+        body.theme-bl .main-grid .ore-panel.revealed, body.theme-bl .stat-item.revealed {
+            opacity: 1; transform: translateY(0) scale(1);
+        }
+        /* 拼贴卡片带着自己的歪斜角度弹入 */
+        body.theme-bl .game-card, body.theme-bl .step-card {
+            opacity: 0; transform: var(--tilt) translateY(70px) scale(0.55);
+            transition: opacity 0.5s ease, transform 0.6s cubic-bezier(.34,1.56,.64,1), box-shadow 0.3s;
+        }
+        body.theme-bl .game-card.revealed, body.theme-bl .step-card.revealed {
+            opacity: 1; transform: var(--tilt);
+        }
+
+        /* 悬浮:卡片回正放大 + 图标摇摆 */
+        body.theme-bl .game-card.revealed:hover, body.theme-bl .step-card.revealed:hover {
+            transform: rotate(0deg) scale(1.06) translateY(-8px);
+            z-index: 20;
+        }
+        body.theme-bl .game-card:nth-child(3n+1).revealed:hover { box-shadow: inset 0 6px var(--bl-gold), 12px 14px 0 rgba(0,0,0,0.85); }
+        body.theme-bl .game-card:nth-child(3n+2).revealed:hover { box-shadow: inset 0 6px var(--bl-red), 12px 14px 0 rgba(0,0,0,0.85); }
+        body.theme-bl .game-card:nth-child(3n).revealed:hover   { box-shadow: inset 0 6px var(--bl-blue), 12px 14px 0 rgba(0,0,0,0.85); }
+        body.theme-bl .step-card.revealed:hover { box-shadow: 12px 14px 0 rgba(0,0,0,0.85); }
+        body.theme-bl .game-card.revealed:hover .game-icon { animation: iconWiggle 0.55s; }
+        @keyframes iconWiggle {
+            0%, 100% { transform: rotate(0deg) scale(1); }
+            25% { transform: rotate(-9deg) scale(1.15); }
+            60% { transform: rotate(8deg) scale(1.15); }
+        }
+
+        /* 按钮:Q 弹挤压 + 光泽扫过(按压下沉机制保留) */
+        body.theme-bl .button {
+            position: relative; overflow: hidden;
+            transition: transform 0.18s cubic-bezier(.34,1.56,.64,1);
+        }
+        body.theme-bl .button:hover { transform: scale(1.05) rotate(-0.6deg); border-color: var(--bl-offwhite); }
+        body.theme-bl .button:active { transform: translateY(2px) scale(0.98); }
+        body.theme-bl .button::after {
+            content: ''; position: absolute; top: 0; left: -90%; width: 45%; height: 100%;
+            background: linear-gradient(105deg, transparent, rgba(255,255,255,0.5), transparent);
+            transform: skewX(-20deg); transition: left 0.45s ease; pointer-events: none;
+        }
+        body.theme-bl .button:hover::after { left: 140%; }
+
+        /* 亮面板上的文字颜色修正 + 联系面板居中 */
+        body.theme-bl [data-key="p1_desc"], body.theme-bl [data-key="p2_desc"] { color: #4A4A4A !important; }
+        body.theme-bl .main-grid > .ore-panel:nth-child(2) { text-align: center; }
+
+        @media (max-width: 768px) {
+            .bl-stats { grid-template-columns: repeat(2, 1fr); }
+            body.theme-bl .band { padding: 55px 16px; }
+        }
+    </style>
 </head>
-<body>
+<body class="theme-ore lang-zh">
+<script>
+    // 首屏前预设主题/语言,避免切换闪烁
+    (function(){
+        var th = localStorage.getItem('bl-theme') || 'ore';
+        var lg = localStorage.getItem('bl-lang') || 'zh';
+        document.body.className = 'theme-' + th + ' lang-' + lg;
+    })();
+</script>
 
 <audio id="snd-click" src="sounds_click.ogg"></audio>
 <audio id="snd-button" src="sounds_button.ogg"></audio>
@@ -123,82 +504,477 @@
 <audio id="snd-open" src="sounds_drawer_open.ogg"></audio>
 <audio id="snd-close" src="sounds_drawer_close.ogg"></audio>
 
-<nav>SHIVR-DEV STUDIO</nav>
+<nav>
+    <span class="nav-brand">
+        <img id="nav-icon" src="assets/bl-logo-icon.png" alt="BL">
+        <span id="nav-title" class="bl-hl">SHIVR-DEV STUDIO</span>
+    </span>
+    <span class="nav-controls">
+        <button class="button" id="btn-theme-ore" onclick="setTheme('ore')">ORE</button>
+        <button class="button" id="btn-theme-bl" onclick="setTheme('bl')">BL</button>
+        <span class="nav-divider"></span>
+        <button class="button" id="btn-lang-zh" onclick="setLang('zh')">中文</button>
+        <button class="button" id="btn-lang-en" onclick="setLang('en')">EN</button>
+        <button class="button" id="btn-lang-ja" onclick="setLang('ja')">日本語</button>
+    </span>
+</nav>
 
 <div id="toast-container"></div>
 
 <section class="hero">
     <div class="logo-container">
-        <img src="logo.png" class="logo-img" alt="Logo" style="min-width:200px; min-height:100px; border:2px dashed #666;">
+        <img src="logo.png" id="hero-logo" class="logo-img" alt="Logo" style="min-width:200px; min-height:100px;">
     </div>
+    <div class="scroll-cue">▼</div>
 </section>
 
-<div class="main-grid">
+<!-- ===== BL 主题专属区块(Ore 主题下自动隐藏) ===== -->
+<div class="bl-only bl-ipbar">
+    <span class="ip-label bl-hl" data-key="ip_label">SERVER IP</span>
+    <span class="ip-value bl-hl">PLAY.BLOCKLEGENDS.NET</span>
+    <button class="button" onclick="copyIp()" data-key="ip_btn">复制 IP</button>
+</div>
+
+<div class="band band-white bl-only"><div class="bl-intro">
+    <h1 class="bl-hl" data-key="intro_h1"></h1>
+    <p data-key="intro_p"></p>
+</div></div>
+
+<div class="marquee mq-gold bl-only"><div class="marquee-inner"><span data-mq></span><span data-mq></span></div></div>
+
+<div class="band band-gold bl-only"><div class="bl-section">
+    <h2 class="bl-hl" data-key="games_title"></h2>
+    <div class="game-grid">
+        <div class="game-card">
+            <div class="game-icon">🏁</div>
+            <div class="game-title bl-hl" data-key="g1_t"></div>
+            <div class="game-desc" data-key="g1_d"></div>
+        </div>
+        <div class="game-card">
+            <div class="game-icon">⚔️</div>
+            <div class="game-title bl-hl" data-key="g2_t"></div>
+            <div class="game-desc" data-key="g2_d"></div>
+        </div>
+        <div class="game-card">
+            <div class="game-icon">🚩</div>
+            <div class="game-title bl-hl" data-key="g3_t"></div>
+            <div class="game-desc" data-key="g3_d"></div>
+        </div>
+        <div class="game-card">
+            <div class="game-icon">⏳</div>
+            <div class="game-title bl-hl" data-key="g4_t"></div>
+            <div class="game-desc" data-key="g4_d"></div>
+        </div>
+        <div class="game-card">
+            <div class="game-icon">🧱</div>
+            <div class="game-title bl-hl" data-key="g5_t"></div>
+            <div class="game-desc" data-key="g5_d"></div>
+        </div>
+        <div class="game-card">
+            <div class="game-icon">☁️</div>
+            <div class="game-title bl-hl" data-key="g6_t"></div>
+            <div class="game-desc" data-key="g6_d"></div>
+        </div>
+    </div>
+</div></div>
+
+<div class="band band-red bl-only"><div class="bl-section" style="padding:0;">
+    <div class="bl-stats">
+        <div class="stat-item"><div class="stat-num bl-hl" data-count="6">0</div><div class="stat-label" data-key="st1_l"></div></div>
+        <div class="stat-item"><div class="stat-num bl-hl" data-count="32">0</div><div class="stat-label" data-key="st2_l"></div></div>
+        <div class="stat-item"><div class="stat-num bl-hl" data-count="128">0</div><div class="stat-label" data-key="st3_l"></div></div>
+        <div class="stat-item"><div class="stat-num bl-hl" data-count="1">0</div><div class="stat-label" data-key="st4_l"></div></div>
+    </div>
+</div></div>
+
+<div class="band band-blue bl-only"><div class="bl-section">
+    <h2 class="bl-hl" data-key="steps_title"></h2>
+    <div class="step-grid">
+        <div class="step-card">
+            <div class="step-num">1</div>
+            <div class="step-title bl-hl" data-key="s1_t"></div>
+            <div class="step-desc" data-key="s1_d"></div>
+        </div>
+        <div class="step-card">
+            <div class="step-num">2</div>
+            <div class="step-title bl-hl" data-key="s2_t"></div>
+            <div class="step-desc" data-key="s2_d"></div>
+        </div>
+        <div class="step-card">
+            <div class="step-num">3</div>
+            <div class="step-title bl-hl" data-key="s3_t"></div>
+            <div class="step-desc" data-key="s3_d"></div>
+        </div>
+    </div>
+</div></div>
+
+<div class="marquee mq-red bl-only"><div class="marquee-inner"><span data-mq></span><span data-mq></span></div></div>
+
+<div class="band band-white bl-main-band"><div class="main-grid">
     <div class="ore-panel">
-        <div class="panel-title">开发进展</div>
-        <img src="progress.png" style="width:100%; height:140px; object-fit:cover; border:2px solid #000; margin-bottom:15px; background:#111;">
-        <a href="https://shivr-dev.github.io/ideas/" class="button green" onclick="playSfx('snd-button')">查看想法实验室</a>
+        <div class="panel-title bl-hl" data-key="p1_title">开发进展</div>
+        <img src="progress.png" id="p1-img" style="width:100%; height:140px; object-fit:cover; border:2px solid #000; margin-bottom:15px; background:#111;">
+        <p data-key="p1_desc" style="color:#ccc; font-size:14px; line-height:1.7; margin:0 0 15px; display:none;"></p>
+        <a href="https://shivr-dev.github.io/ideas/" class="button green" onclick="playSfx('snd-button')" data-key="p1_btn">查看想法实验室</a>
     </div>
 
     <div class="ore-panel">
-        <div class="panel-title">快捷联系</div>
-        <div style="height:140px; background:#222; display:flex; align-items:center; justify-content:center; font-size:50px; border:2px solid #000; margin-bottom:15px;">✉️</div>
-        <button class="button" onclick="toggleModal('contactModal', true)">显示工作室成员</button>
+        <div class="panel-title bl-hl" data-key="p2_title">快捷联系</div>
+        <p data-key="p2_desc" style="color:#C6D2E8; font-size:14px; line-height:1.7; margin:0 0 15px; display:none;"></p>
+        <div id="p2-emoji" style="height:140px; background:#222; display:flex; align-items:center; justify-content:center; font-size:50px; border:2px solid #000; margin-bottom:15px;">✉️</div>
+        <button class="button" onclick="toggleModal('contactModal', true)" data-key="p2_btn">显示工作室成员</button>
     </div>
 
     <div class="ore-panel full-width-panel" id="recruitment-section">
-        <div class="panel-title">开发者招募 (RECRUITMENT)</div>
-        <p style="color:#ccc; font-size:14px; margin-bottom:20px;">填写下方信息申请加入。审核通过后，即可在主控台登录。</p>
-        
+        <div class="panel-title bl-hl" data-key="rec_title">开发者招募 (RECRUITMENT)</div>
+        <p data-key="rec_desc" style="color:#ccc; font-size:14px; margin-bottom:20px;">填写下方信息申请加入。审核通过后,即可在主控台登录。</p>
+
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
             <div>
-                <label style="font-size:12px; display:block; margin-bottom:5px;">游戏 ID (将作为登录账号)</label>
-                <input type="text" id="join-id" class="input-field" placeholder="输入你的 ID..." onfocus="playSfx('snd-click')">
-                
-                <label style="font-size:12px; display:block; margin-bottom:5px;">联系邮箱</label>
-                <input type="email" id="join-email" class="input-field" placeholder="example@mail.com" onfocus="playSfx('snd-click')">
+                <label data-key="lb_id" style="font-size:12px; display:block; margin-bottom:5px;">游戏 ID (将作为登录账号)</label>
+                <input type="text" id="join-id" class="input-field" data-ph="ph_id" placeholder="输入你的 ID..." onfocus="playSfx('snd-click')">
+
+                <label data-key="lb_email" style="font-size:12px; display:block; margin-bottom:5px;">联系邮箱</label>
+                <input type="email" id="join-email" class="input-field" data-ph="ph_email" placeholder="example@mail.com" onfocus="playSfx('snd-click')">
             </div>
             <div>
-                <label style="font-size:12px; display:block; margin-bottom:5px;">擅长领域 (建模/函数/UI/地图)</label>
-                <input type="text" id="join-role" class="input-field" placeholder="你最擅长什么？" onfocus="playSfx('snd-click')">
-                
-                <label style="font-size:12px; display:block; margin-bottom:5px;">个人简介 (选填)</label>
-                <input type="text" id="join-desc" class="input-field" placeholder="让我们更了解你..." onfocus="playSfx('snd-click')">
+                <label data-key="lb_role" style="font-size:12px; display:block; margin-bottom:5px;">擅长领域 (建模/函数/UI/地图)</label>
+                <input type="text" id="join-role" class="input-field" data-ph="ph_role" placeholder="你最擅长什么?" onfocus="playSfx('snd-click')">
+
+                <label data-key="lb_desc" style="font-size:12px; display:block; margin-bottom:5px;">个人简介 (选填)</label>
+                <input type="text" id="join-desc" class="input-field" data-ph="ph_desc" placeholder="让我们更了解你..." onfocus="playSfx('snd-click')">
             </div>
         </div>
-        
-        <button id="submitBtn" class="button green" style="width:200px; margin: 10px auto 0;" onclick="submitApplication()">提交申请</button>
+
+        <button id="submitBtn" class="button green" style="width:200px; margin: 10px auto 0;" onclick="submitApplication()" data-key="btn_submit">提交申请</button>
     </div>
-</div>
+</div></div>
+
+<footer>
+    <img id="footer-icon" src="assets/bl-logo-icon.png" alt="BL">
+    <span data-key="footer_text">© Shivr-dev Studio</span>
+</footer>
 
 <div id="contactModal" class="modal-overlay">
     <div class="modal-window">
-        <h3 style="margin-top:0;">负责人列表</h3>
-        <div style="line-height:2; border-left:4px solid var(--ore-green-bg); padding-left:15px; color:#ddd;">
+        <h3 style="margin-top:0;" class="bl-hl" data-key="m1_title">负责人列表</h3>
+        <div class="accent-line" style="line-height:2; border-left:4px solid var(--ore-green-bg); padding-left:15px; color:#ddd;">
             • Shivr_toast<br>• 闲逛九头虫划水<br>• Infrato
         </div>
         <br>
-        <button class="button" style="width:100px; margin-left:auto;" onclick="toggleModal('contactModal', false)">确定</button>
+        <button class="button" style="width:100px; margin-left:auto;" onclick="toggleModal('contactModal', false)" data-key="m_ok">确定</button>
     </div>
 </div>
 
 <div id="successModal" class="modal-overlay">
     <div class="modal-window">
-        <h3 style="margin-top:0; color:var(--ore-green-bg);">申请已发送！</h3>
+        <h3 style="margin-top:0; color:var(--ore-green-bg);" class="bl-hl" id="m2_title">申请已发送!</h3>
         <p id="credential-text" style="font-size:14px; line-height:1.6; background:#222; padding:15px; border:1px solid #444;"></p>
-        <p style="font-size:12px; color:#888;">⚠️ 请务必截图或保存好你的密码！管理员在 GitHub 打上 <strong style="color:var(--ore-green-bg);">approved</strong> 标签后，你即可前往想法区登录。</p>
-        <button class="button green" style="width:100px; margin-left:auto;" onclick="toggleModal('successModal', false)">明白了</button>
+        <p style="font-size:12px; color:#888;" id="m2_warn">⚠️ 请务必截图或保存好你的密码!管理员在 GitHub 打上 <strong style="color:var(--ore-green-bg);">approved</strong> 标签后,你即可前往想法区登录。</p>
+        <button class="button green" style="width:100px; margin-left:auto;" onclick="toggleModal('successModal', false)" data-key="m_got">明白了</button>
     </div>
 </div>
 
 <script>
     // ======= 请配置你的 Token =======
-    const p1 = 'ghp_'; 
+    const p1 = 'ghp_';
     const p2 = '9LZtot1qgVw1k1FSQVSSCIDlDlpJqL2rSs2D'; // 请填入有 repo 权限的 token
-    const G_TOKEN = p1 + p2; 
+    const G_TOKEN = p1 + p2;
     const REPO_OWNER = 'shivr-dev';
     const REPO_NAME = 'ideas-data'; // 提交到你的仓库
     // ================================
+
+    // ============ 多语言 + 双主题文案表 ============
+    // TEXT[主题][语言][键] —— Ore 主题文案与原版完全一致
+    const TEXT = {
+        ore: {
+            zh: {
+                doc_title: 'Shivr-dev Studio | 官网与招募',
+                nav_title: 'SHIVR-DEV STUDIO',
+                p1_title: '开发进展', p1_desc: '', p1_btn: '查看想法实验室',
+                p2_title: '快捷联系', p2_btn: '显示工作室成员', p2_emoji: '✉️',
+                rec_title: '开发者招募 (RECRUITMENT)',
+                rec_desc: '填写下方信息申请加入。审核通过后,即可在主控台登录。',
+                lb_id: '游戏 ID (将作为登录账号)', ph_id: '输入你的 ID...',
+                lb_email: '联系邮箱', ph_email: 'example@mail.com',
+                lb_role: '擅长领域 (建模/函数/UI/地图)', ph_role: '你最擅长什么?',
+                lb_desc: '个人简介 (选填)', ph_desc: '让我们更了解你...',
+                btn_submit: '提交申请', submitting: '提交中...',
+                footer_text: '© Shivr-dev Studio',
+                m1_title: '负责人列表', m_ok: '确定',
+                m2_title: '申请已发送!', m_got: '明白了',
+                m2_warn: '⚠️ 请务必截图或保存好你的密码!管理员在 GitHub 打上 <strong style="color:#6CC349;">approved</strong> 标签后,你即可前往想法区登录。',
+                cred_account: '登录账号', cred_pass: '初始密码', cred_wait: '(当前状态:等待管理员审核...)',
+                toast_ready: 'Ore UI 招募系统已就绪。',
+                toast_incomplete: '请填写完整必填信息!',
+                toast_fail: '提交失败,请检查网络或 Token 设置!',
+                hero_logo: 'logo.png', p1_img: 'progress.png'
+            },
+            en: {
+                doc_title: 'Shivr-dev Studio | Official Site & Recruitment',
+                nav_title: 'SHIVR-DEV STUDIO',
+                p1_title: 'DEV PROGRESS', p1_desc: '', p1_btn: 'Open Ideas Lab',
+                p2_title: 'QUICK CONTACT', p2_btn: 'Show Studio Members', p2_emoji: '✉️',
+                rec_title: 'RECRUITMENT',
+                rec_desc: 'Fill in the form below to apply. Once approved, you can log in on the console.',
+                lb_id: 'Game ID (used as login account)', ph_id: 'Enter your ID...',
+                lb_email: 'Contact Email', ph_email: 'example@mail.com',
+                lb_role: 'Specialty (Modeling / Functions / UI / Maps)', ph_role: 'What are you best at?',
+                lb_desc: 'Bio (optional)', ph_desc: 'Tell us more about you...',
+                btn_submit: 'Submit Application', submitting: 'Submitting...',
+                footer_text: '© Shivr-dev Studio',
+                m1_title: 'Staff List', m_ok: 'OK',
+                m2_title: 'Application Sent!', m_got: 'Got it',
+                m2_warn: '⚠️ Be sure to screenshot or save your password! After an admin adds the <strong style="color:#6CC349;">approved</strong> label on GitHub, you can log in at the ideas section.',
+                cred_account: 'Login ID', cred_pass: 'Initial Password', cred_wait: '(Status: awaiting admin review...)',
+                toast_ready: 'Ore UI recruitment system ready.',
+                toast_incomplete: 'Please fill in all required fields!',
+                toast_fail: 'Submission failed. Check network or Token settings!',
+                hero_logo: 'logo.png', p1_img: 'progress.png'
+            },
+            ja: {
+                doc_title: 'Shivr-dev Studio | 公式サイト & 募集',
+                nav_title: 'SHIVR-DEV STUDIO',
+                p1_title: '開発進捗', p1_desc: '', p1_btn: 'アイデアラボを見る',
+                p2_title: '連絡先', p2_btn: 'スタジオメンバーを表示', p2_emoji: '✉️',
+                rec_title: '開発者募集 (RECRUITMENT)',
+                rec_desc: '下記のフォームから応募してください。承認後、コンソールにログインできます。',
+                lb_id: 'ゲーム ID (ログインIDになります)', ph_id: 'IDを入力...',
+                lb_email: '連絡先メール', ph_email: 'example@mail.com',
+                lb_role: '得意分野 (モデリング/コマンド/UI/マップ)', ph_role: 'あなたの得意なことは?',
+                lb_desc: '自己紹介 (任意)', ph_desc: 'あなたのことを教えてください...',
+                btn_submit: '応募する', submitting: '送信中...',
+                footer_text: '© Shivr-dev Studio',
+                m1_title: '担当者リスト', m_ok: 'OK',
+                m2_title: '応募を送信しました!', m_got: '了解',
+                m2_warn: '⚠️ パスワードは必ずスクリーンショット等で保存してください!管理者が GitHub で <strong style="color:#6CC349;">approved</strong> ラベルを付けると、アイデアページにログインできます。',
+                cred_account: 'ログインID', cred_pass: '初期パスワード', cred_wait: '(現在の状態:管理者の審査待ち...)',
+                toast_ready: 'Ore UI 募集システムの準備ができました。',
+                toast_incomplete: '必須項目をすべて入力してください!',
+                toast_fail: '送信に失敗しました。ネットワークまたは Token 設定を確認してください!',
+                hero_logo: 'logo.png', p1_img: 'progress.png'
+            }
+        },
+        bl: {
+            zh: {
+                doc_title: 'Block Legends | 锦标赛服务器',
+                nav_title: 'BLOCK LEGENDS',
+                p1_title: '赛事日历', p1_desc: '',
+                p1_btn: '查看玩法与赛事日历',
+                ip_label: '服务器地址', ip_btn: '复制 IP', toast_copied: '服务器 IP 已复制!',
+                intro_h1: '传奇在此诞生',
+                intro_p: 'Block Legends 是一个对标 MC Championship(MCC)的 Minecraft 锦标赛网络服务器。每个赛季,数十支四人小队登上同一张主题地图,在六款轮换小游戏中正面交锋——跑酷、PVP、夺旗、生存、速建、空岛乱斗。没有氪金数值,只有操作、配合和脑子。积分写进赛季史册,冠军的名字刻在出生点的石碑上。',
+                games_title: '六款轮换小游戏',
+                g1_t: '跑酷竞速 PARKOUR RUSH', g1_d: '在检查点赛道上比拼最速通关。坠落即重来,最大胆的路线才配得上冠军。',
+                g2_t: '决斗竞技场 BATTLE ARENA', g2_d: '小队淘汰制 PVP,装备池每轮随机轮换——配合比枪法更重要。',
+                g3_t: '夺旗大战 FLAG FRENZY', g3_d: '攻守转换的夺旗模式:偷旗、护旗、反打,一波团灭直接带走比赛。',
+                g4_t: '沙漏求生 SANDS OF SURVIVAL', g4_d: '在沙漏流尽之前搜刮资源并活到最后,安全区边界会不断收缩。',
+                g5_t: '速建大师 BUILD BLITZ', g5_d: '看题记忆、限时复刻建筑,速度与还原度的双重比拼。',
+                g6_t: '天降乱斗 SKY FALL', g6_d: '从空岛开局,资源从天而降。站到最后的小队,才能带走全部积分。',
+                steps_title: '赛季怎么玩',
+                s1_t: '组队报名', s1_d: '4 人一队,赛季初开放报名,个人玩家由系统匹配队友。',
+                s2_t: '轮换积分', s2_d: '六款小游戏轮换登场,按每场名次累计队伍积分。',
+                s3_t: '总决赛', s3_d: '积分前二的队伍进入决赛地图,一战定冠军。',
+                mq_text: '★ BLOCK LEGENDS ★ 第一赛季 火热报名中 ★ 六款轮换小游戏 ★ 32 支队伍 ★ 128 名选手 ★ 冠军留名石碑 ★ BLOCK LEGENDS ★ 第一赛季 火热报名中 ★ 六款轮换小游戏 ★ 32 支队伍 ★ 128 名选手 ★ 冠军留名石碑 ',
+                st1_l: '轮换小游戏', st2_l: '参赛队伍', st3_l: '活跃选手', st4_l: '赛季冠军',
+                p2_desc: '想报名下一赛季,或洽谈赞助与联动?联系运营团队,或直接提交下方的招募申请。',
+                p2_title: '快捷联系', p2_btn: '显示运营团队', p2_emoji: '🏆',
+                rec_title: 'BUILDER / 开发者招募 (RECRUITMENT)',
+                rec_desc: '填写下方信息申请加入 Block Legends 建设团队(地图建筑 / 小游戏开发 / UI 美术)。审核通过后,即可在主控台登录。',
+                lb_id: '游戏 ID (将作为登录账号)', ph_id: '输入你的 ID...',
+                lb_email: '联系邮箱', ph_email: 'example@mail.com',
+                lb_role: '擅长领域 (建模/函数/UI/地图)', ph_role: '你最擅长什么?',
+                lb_desc: '个人简介 (选填)', ph_desc: '让我们更了解你...',
+                btn_submit: '提交申请', submitting: '提交中...',
+                footer_text: '© Block Legends — 一个 Minecraft 锦标赛网络服务器',
+                m1_title: '运营团队', m_ok: '确定',
+                m2_title: '申请已发送!', m_got: '明白了',
+                m2_warn: '⚠️ 请务必截图或保存好你的密码!管理员在 GitHub 打上 <strong style="color:#FFD829;">approved</strong> 标签后,你即可前往想法区登录。',
+                cred_account: '登录账号', cred_pass: '初始密码', cred_wait: '(当前状态:等待管理员审核...)',
+                toast_ready: 'Block Legends 招募系统已就绪。',
+                toast_incomplete: '请填写完整必填信息!',
+                toast_fail: '提交失败,请检查网络或 Token 设置!',
+                hero_logo: 'assets/bl-logo-full.png', p1_img: 'assets/bl-keyart.png'
+            },
+            en: {
+                doc_title: 'Block Legends | Tournament Server',
+                nav_title: 'BLOCK LEGENDS',
+                p1_title: 'EVENT CALENDAR', p1_desc: '',
+                p1_btn: 'View Games & Event Calendar',
+                ip_label: 'SERVER IP', ip_btn: 'COPY IP', toast_copied: 'Server IP copied!',
+                intro_h1: 'WHERE LEGENDS ARE MADE',
+                intro_p: 'Block Legends is a Minecraft tournament network inspired by MC Championship (MCC). Every season, dozens of four-player squads drop into one themed map and clash across six rotating minigames — parkour, PVP, capture the flag, survival, speed building and sky brawls. No pay-to-win stats. Just skill, teamwork and nerve. Points go down in the season record books, and the champions\' names are carved into the spawn monument.',
+                games_title: 'SIX ROTATING MINIGAMES',
+                g1_t: 'PARKOUR RUSH', g1_d: 'Race checkpoint courses for the fastest clear. Fall and you restart — the boldest route takes the crown.',
+                g2_t: 'BATTLE ARENA', g2_d: 'Bracket-style team PVP with a randomized kit pool every round. Coordination beats aim.',
+                g3_t: 'FLAG FRENZY', g3_d: 'Attack-and-defend capture the flag: steal it, guard it, and end the match in one clean push.',
+                g4_t: 'SANDS OF SURVIVAL', g4_d: 'Scavenge and stay alive before the hourglass runs out, while the safe zone keeps shrinking.',
+                g5_t: 'BUILD BLITZ', g5_d: 'Memorize the model, then rebuild it against the clock. Speed meets accuracy.',
+                g6_t: 'SKY FALL', g6_d: 'Drop onto sky islands as loot rains from above. The last team standing takes every point.',
+                steps_title: 'HOW A SEASON WORKS',
+                s1_t: 'TEAM UP', s1_d: 'Squads of four. Sign-ups open at season start; solo players get auto-matched.',
+                s2_t: 'EARN POINTS', s2_d: 'Six minigames rotate in. Every placement adds points to your team total.',
+                s3_t: 'GRAND FINAL', s3_d: 'The top two teams enter the finale map. One match decides the champion.',
+                mq_text: '★ BLOCK LEGENDS ★ SEASON 1 — SIGN-UPS OPEN ★ SIX ROTATING MINIGAMES ★ 32 TEAMS ★ 128 PLAYERS ★ CHAMPIONS ON THE MONUMENT ★ BLOCK LEGENDS ★ SEASON 1 — SIGN-UPS OPEN ★ SIX ROTATING MINIGAMES ★ 32 TEAMS ★ 128 PLAYERS ★ CHAMPIONS ON THE MONUMENT ',
+                st1_l: 'MINIGAMES', st2_l: 'TEAMS', st3_l: 'PLAYERS', st4_l: 'CHAMPION',
+                p2_desc: 'Want to join the next season, or talk sponsorship and collabs? Reach the staff team — or apply below.',
+                p2_title: 'QUICK CONTACT', p2_btn: 'Show Staff Team', p2_emoji: '🏆',
+                rec_title: 'BUILDER / DEV RECRUITMENT',
+                rec_desc: 'Apply below to join the Block Legends build team (map building / minigame dev / UI art). Once approved, you can log in on the console.',
+                lb_id: 'Game ID (used as login account)', ph_id: 'Enter your ID...',
+                lb_email: 'Contact Email', ph_email: 'example@mail.com',
+                lb_role: 'Specialty (Modeling / Functions / UI / Maps)', ph_role: 'What are you best at?',
+                lb_desc: 'Bio (optional)', ph_desc: 'Tell us more about you...',
+                btn_submit: 'Submit Application', submitting: 'Submitting...',
+                footer_text: '© Block Legends — A Minecraft Tournament Network',
+                m1_title: 'STAFF TEAM', m_ok: 'OK',
+                m2_title: 'Application Sent!', m_got: 'Got it',
+                m2_warn: '⚠️ Be sure to screenshot or save your password! After an admin adds the <strong style="color:#FFD829;">approved</strong> label on GitHub, you can log in at the ideas section.',
+                cred_account: 'Login ID', cred_pass: 'Initial Password', cred_wait: '(Status: awaiting admin review...)',
+                toast_ready: 'Block Legends recruitment system ready.',
+                toast_incomplete: 'Please fill in all required fields!',
+                toast_fail: 'Submission failed. Check network or Token settings!',
+                hero_logo: 'assets/bl-logo-full.png', p1_img: 'assets/bl-keyart.png'
+            },
+            ja: {
+                doc_title: 'Block Legends | トーナメントサーバー',
+                nav_title: 'BLOCK LEGENDS',
+                p1_title: 'イベントカレンダー', p1_desc: '',
+                p1_btn: 'ゲーム&イベントカレンダー',
+                ip_label: 'サーバーアドレス', ip_btn: 'IPをコピー', toast_copied: 'サーバーIPをコピーしました!',
+                intro_h1: 'レジェンドはここで生まれる',
+                intro_p: 'Block Legends は、MC Championship(MCC)にインスパイアされた Minecraft トーナメントネットワークです。シーズンごとに数十の4人チームが同じテーママップに集い、6つのローテーションミニゲーム——パルクール、PVP、フラッグ争奪、サバイバル、スピード建築、スカイバトル——で激突します。課金ステータスはなし。あるのは技術、連携、そして度胸だけ。ポイントはシーズンの記録に刻まれ、チャンピオンの名はスポーンのモニュメントに刻まれます。',
+                games_title: '6つのローテーションミニゲーム',
+                g1_t: 'パルクールラッシュ', g1_d: 'チェックポイントコースで最速クリアを競え。落ちたらやり直し——大胆なルートこそが勝利への鍵。',
+                g2_t: 'バトルアリーナ', g2_d: '装備プールが毎ラウンドランダムに変わるチーム制PVP。エイムより連携がものを言う。',
+                g3_t: 'フラッグフレンジー', g3_d: '攻守交代のフラッグ争奪戦。奪って、守って、一気に決めろ。',
+                g4_t: 'サンズ・オブ・サバイバル', g4_d: '砂時計が尽きる前に物資を漁り、狭まる安全地帯で生き残れ。',
+                g5_t: 'ビルドブリッツ', g5_d: 'お題の建築を記憶し、制限時間内に再現せよ。スピードと正確さの勝負。',
+                g6_t: 'スカイフォール', g6_d: 'スカイアイランドに降り立ち、降り注ぐ物資を拾え。最後まで残ったチームが全ポイントを獲得。',
+                steps_title: 'シーズンの流れ',
+                s1_t: 'チーム結成', s1_d: '4人1チーム。シーズン開始時に募集、ソロプレイヤーは自動マッチング。',
+                s2_t: 'ポイント獲得', s2_d: '6つのミニゲームがローテーション。各試合の順位がチームポイントに加算。',
+                s3_t: 'グランドファイナル', s3_d: '上位2チームが決勝マップへ。優勝は一発勝負。',
+                mq_text: '★ BLOCK LEGENDS ★ シーズン1 参加受付中 ★ 6つのミニゲーム ★ 32チーム ★ 128名のプレイヤー ★ チャンピオンは石碑に名を刻む ★ BLOCK LEGENDS ★ シーズン1 参加受付中 ★ 6つのミニゲーム ★ 32チーム ★ 128名のプレイヤー ★ チャンピオンは石碑に名を刻む ',
+                st1_l: 'ミニゲーム', st2_l: '参加チーム', st3_l: 'プレイヤー', st4_l: 'チャンピオン',
+                p2_desc: '次シーズンの参加やスポンサー・コラボの相談は運営チームへ。または下のフォームから応募してください。',
+                p2_title: '連絡先', p2_btn: '運営チームを表示', p2_emoji: '🏆',
+                rec_title: 'ビルダー / 開発者募集 (RECRUITMENT)',
+                rec_desc: '下記のフォームから Block Legends 建設チーム(マップ制作 / ミニゲーム開発 / UI アート)に応募できます。承認後、コンソールにログインできます。',
+                lb_id: 'ゲーム ID (ログインIDになります)', ph_id: 'IDを入力...',
+                lb_email: '連絡先メール', ph_email: 'example@mail.com',
+                lb_role: '得意分野 (モデリング/コマンド/UI/マップ)', ph_role: 'あなたの得意なことは?',
+                lb_desc: '自己紹介 (任意)', ph_desc: 'あなたのことを教えてください...',
+                btn_submit: '応募する', submitting: '送信中...',
+                footer_text: '© Block Legends — Minecraft トーナメントネットワーク',
+                m1_title: '運営チーム', m_ok: 'OK',
+                m2_title: '応募を送信しました!', m_got: '了解',
+                m2_warn: '⚠️ パスワードは必ずスクリーンショット等で保存してください!管理者が GitHub で <strong style="color:#FFD829;">approved</strong> ラベルを付けると、アイデアページにログインできます。',
+                cred_account: 'ログインID', cred_pass: '初期パスワード', cred_wait: '(現在の状態:管理者の審査待ち...)',
+                toast_ready: 'Block Legends 募集システムの準備ができました。',
+                toast_incomplete: '必須項目をすべて入力してください!',
+                toast_fail: '送信に失敗しました。ネットワークまたは Token 設定を確認してください!',
+                hero_logo: 'assets/bl-logo-full.png', p1_img: 'assets/bl-keyart.png'
+            }
+        }
+    };
+
+    let CUR_THEME = localStorage.getItem('bl-theme') || 'ore';
+    let CUR_LANG  = localStorage.getItem('bl-lang') || 'zh';
+
+    function t(key) { return TEXT[CUR_THEME][CUR_LANG][key]; }
+
+    function applyAll() {
+        const dict = TEXT[CUR_THEME][CUR_LANG];
+        document.body.className = 'theme-' + CUR_THEME + ' lang-' + CUR_LANG;
+        document.documentElement.lang = { zh: 'zh-CN', en: 'en', ja: 'ja' }[CUR_LANG];
+        document.title = dict.doc_title;
+
+        document.querySelectorAll('[data-key]').forEach(el => {
+            const v = dict[el.dataset.key];
+            if (v !== undefined) el.innerText = v;
+        });
+        document.querySelectorAll('[data-ph]').forEach(el => {
+            const v = dict[el.dataset.ph];
+            if (v !== undefined) el.placeholder = v;
+        });
+
+        // 描述段落:Ore 无描述时隐藏,BL 显示
+        ['p1_desc', 'p2_desc'].forEach(k => {
+            const el = document.querySelector('[data-key="' + k + '"]');
+            if (el) el.style.display = dict[k] ? 'block' : 'none';
+        });
+        // 跑马灯文案
+        document.querySelectorAll('[data-mq]').forEach(el => { el.innerText = dict.mq_text || ''; });
+
+        document.getElementById('nav-title').innerText = dict.nav_title;
+        document.getElementById('hero-logo').src = dict.hero_logo;
+        document.getElementById('p1-img').src = dict.p1_img;
+        document.getElementById('p2-emoji').innerText = dict.p2_emoji;
+        document.getElementById('m2_title').innerText = dict.m2_title;
+        document.getElementById('m2_warn').innerHTML = dict.m2_warn;
+
+        // 切换器高亮
+        ['ore', 'bl'].forEach(th =>
+            document.getElementById('btn-theme-' + th).classList.toggle('switcher-active', th === CUR_THEME));
+        ['zh', 'en', 'ja'].forEach(lg =>
+            document.getElementById('btn-lang-' + lg).classList.toggle('switcher-active', lg === CUR_LANG));
+    }
+
+    function setTheme(th) {
+        if (th === CUR_THEME) return;
+        CUR_THEME = th;
+        localStorage.setItem('bl-theme', th);
+        playSfx('snd-button');
+        applyAll();
+    }
+
+    function setLang(lg) {
+        if (lg === CUR_LANG) return;
+        CUR_LANG = lg;
+        localStorage.setItem('bl-lang', lg);
+        playSfx('snd-click');
+        applyAll();
+    }
+
+    // ===== BL 炫酷动效:滚动显现 / 数字滚动 / 3D 倾斜 =====
+    function animateCount(el) {
+        const target = parseInt(el.dataset.count, 10);
+        const dur = 1200, t0 = performance.now();
+        (function tick(now) {
+            const p = Math.min((now - t0) / dur, 1);
+            el.innerText = Math.round(target * (1 - Math.pow(1 - p, 3)));
+            if (p < 1) requestAnimationFrame(tick);
+        })(t0);
+    }
+
+    function initFx() {
+        const targets = document.querySelectorAll(
+            '.bl-intro, .bl-section > h2, .game-card, .step-card, .main-grid .ore-panel, .stat-item');
+        // 记录每个元素在同级中的序号,用于错落进场
+        targets.forEach(el => {
+            el.dataset.stagger = Array.prototype.indexOf.call(el.parentNode.children, el) % 6;
+        });
+        const io = new IntersectionObserver(entries => {
+            entries.forEach(en => {
+                if (!en.isIntersecting) return;
+                const el = en.target;
+                el.style.transitionDelay = (parseInt(el.dataset.stagger, 10) * 0.07) + 's';
+                el.classList.add('revealed');
+                el.querySelectorAll('.stat-num[data-count]').forEach(animateCount);
+                setTimeout(() => { el.style.transitionDelay = ''; }, 1000); // 清除延迟,保证悬浮跟手
+                io.unobserve(el);
+            });
+        }, { threshold: 0.12 });
+        targets.forEach(el => io.observe(el));
+    }
+
+    // 0. 复制服务器 IP(复用原版 Toast / 音效)
+    function copyIp() {
+        playSfx('snd-button');
+        if (navigator.clipboard) navigator.clipboard.writeText('PLAY.BLOCKLEGENDS.NET').catch(()=>{});
+        showToast(t('toast_copied'));
+    }
 
     // 1. 基础交互逻辑
     function playSfx(id) {
@@ -241,15 +1017,15 @@
         const desc = document.getElementById('join-desc').value.trim() || '无';
 
         if (!id || !email || !role) {
-            showToast("请填写完整必填信息！");
+            showToast(t('toast_incomplete'));
             return;
         }
 
         const password = generatePass();
         playSfx('snd-button');
-        
+
         const btn = document.getElementById('submitBtn');
-        btn.innerText = "提交中...";
+        btn.innerText = t('submitting');
         btn.disabled = true;
 
         const issueData = {
@@ -271,18 +1047,19 @@
 
             if (!res.ok) throw new Error('网络异常');
 
-            document.getElementById('credential-text').innerHTML = `<strong>登录账号:</strong> ${id}<br><strong>初始密码:</strong> ${password}<br><br><span style="color:#aaa;">(当前状态：等待管理员审核...)</span>`;
+            document.getElementById('credential-text').innerHTML =
+                `<strong>${t('cred_account')}:</strong> ${id}<br><strong>${t('cred_pass')}:</strong> ${password}<br><br><span style="color:#aaa;">${t('cred_wait')}</span>`;
             toggleModal('successModal', true);
-            
+
             // 清空表单
             document.getElementById('join-id').value = '';
             document.getElementById('join-email').value = '';
             document.getElementById('join-role').value = '';
             document.getElementById('join-desc').value = '';
         } catch (err) {
-            showToast("提交失败，请检查网络或 Token 设置！");
+            showToast(t('toast_fail'));
         } finally {
-            btn.innerText = "提交申请";
+            btn.innerText = t('btn_submit');
             btn.disabled = false;
         }
     }
@@ -291,7 +1068,11 @@
         if (!['BUTTON', 'INPUT', 'A'].includes(e.target.tagName)) { playSfx('snd-click'); }
     });
 
-    window.onload = () => { setTimeout(() => showToast("Ore UI 招募系统已就绪。"), 1000); };
+    window.onload = () => {
+        applyAll();
+        initFx();
+        setTimeout(() => showToast(t('toast_ready')), 1000);
+    };
     const AUTH_REPO = 'ideas-data';
 
 </script>
