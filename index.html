@@ -283,11 +283,23 @@
 
         /* 区块标题 */
         .bl-section { max-width: 1000px; margin: 0 auto; padding: 45px 20px 10px; }
+        .bl-section { text-align: center; }
         .bl-section > h2 {
-            text-align: center; font-size: clamp(28px, 4vw, 46px);
-            color: #1E1E1F; margin: 10px 0 34px;
-            text-shadow: 3px 3px 0 rgba(255,216,41,0.65);
+            --tilt: rotate(-1.5deg);
+            display: inline-block; text-align: center;
+            font-size: clamp(28px, 4vw, 46px);
+            color: #1E1E1F; margin: 10px 0 40px;
+            background: var(--bl-offwhite);
+            border: 3px solid #1E1E1F;
+            box-shadow: 6px 6px 0 rgba(0,0,0,0.85);
+            padding: 10px 32px;
+            transform: var(--tilt);
         }
+        /* 卡片序号角标颜色变量 */
+        .game-card { position: relative; }
+        .game-card:nth-child(3n+1) { --accent: var(--bl-gold); }
+        .game-card:nth-child(3n+2) { --accent: var(--bl-red); }
+        .game-card:nth-child(3n)   { --accent: var(--bl-blue); }
 
         /* 小游戏卡片:歪斜重叠拼贴 */
         .game-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; align-items: start; }
@@ -372,8 +384,8 @@
             background: var(--bl-blue);
             border-bottom: 4px solid var(--bl-offblack);
         }
-        body.theme-bl .band-gold .bl-section > h2 { text-shadow: 3px 3px 0 rgba(255,255,255,0.5); }
-        body.theme-bl .band-blue .bl-section > h2 { color: var(--bl-offwhite); text-shadow: 3px 3px 0 rgba(0,0,0,0.45); }
+        body.theme-bl .band-gold .bl-section > h2 { --tilt: rotate(1.5deg); }
+        body.theme-bl .band-blue .bl-section > h2 { background: var(--bl-gold); }
 
         /* 导航加大 */
         body.theme-bl nav { height: 60px; }
@@ -429,21 +441,21 @@
         .stat-label { margin-top: 8px; font-size: 13px; letter-spacing: 2px; color: rgba(255,255,255,0.9); text-transform: uppercase; }
 
         /* Q 弹滚动显现(仅 BL 预隐藏,Ore 不受影响) */
-        body.theme-bl .bl-intro, body.theme-bl .bl-section > h2,
+        body.theme-bl .bl-intro,
         body.theme-bl .main-grid .ore-panel, body.theme-bl .stat-item {
             opacity: 0; transform: translateY(60px) scale(0.85);
             transition: opacity 0.5s ease, transform 0.65s cubic-bezier(.34,1.56,.64,1);
         }
-        body.theme-bl .bl-intro.revealed, body.theme-bl .bl-section > h2.revealed,
+        body.theme-bl .bl-intro.revealed,
         body.theme-bl .main-grid .ore-panel.revealed, body.theme-bl .stat-item.revealed {
             opacity: 1; transform: translateY(0) scale(1);
         }
-        /* 拼贴卡片带着自己的歪斜角度弹入 */
-        body.theme-bl .game-card, body.theme-bl .step-card {
+        /* 贴纸标题与拼贴卡片带着自己的歪斜角度弹入 */
+        body.theme-bl .bl-section > h2, body.theme-bl .game-card, body.theme-bl .step-card {
             opacity: 0; transform: var(--tilt) translateY(70px) scale(0.55);
             transition: opacity 0.5s ease, transform 0.6s cubic-bezier(.34,1.56,.64,1), box-shadow 0.3s;
         }
-        body.theme-bl .game-card.revealed, body.theme-bl .step-card.revealed {
+        body.theme-bl .bl-section > h2.revealed, body.theme-bl .game-card.revealed, body.theme-bl .step-card.revealed {
             opacity: 1; transform: var(--tilt);
         }
 
@@ -481,9 +493,103 @@
         body.theme-bl [data-key="p1_desc"], body.theme-bl [data-key="p2_desc"] { color: #4A4A4A !important; }
         body.theme-bl .main-grid > .ore-panel:nth-child(2) { text-align: center; }
 
+        /* Hero 漂浮图标 */
+        .float-item {
+            position: absolute; font-size: 36px; z-index: 2; pointer-events: none;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5));
+            animation: floatBob 6s ease-in-out infinite;
+        }
+        @keyframes floatBob {
+            0%, 100% { transform: translateY(0) rotate(-7deg); }
+            50% { transform: translateY(-18px) rotate(7deg); }
+        }
+
+        /* 赛季贴纸徽章 */
+        .season-badge {
+            position: absolute; right: 7%; bottom: 42px; z-index: 3;
+            background: var(--bl-gold); color: var(--bl-offblack);
+            border: 3px solid #1E1E1F; box-shadow: 5px 5px 0 rgba(0,0,0,0.85);
+            padding: 6px 18px; font-size: 22px; letter-spacing: 2px;
+            animation: badgeBob 4s ease-in-out infinite;
+        }
+        @keyframes badgeBob {
+            0%, 100% { transform: rotate(6deg) translateY(0); }
+            50% { transform: rotate(3deg) translateY(-10px); }
+        }
+
+        /* IP 旁 LIVE 呼吸灯 */
+        .live-dot {
+            width: 14px; height: 14px; border-radius: 50%;
+            background: #2FBF4C; border: 2px solid #1E1E1F; position: relative;
+        }
+        .live-dot::after {
+            content: ''; position: absolute; inset: -6px; border-radius: 50%;
+            border: 3px solid rgba(47,191,76,0.7);
+            animation: livePing 1.6s ease-out infinite;
+        }
+        @keyframes livePing {
+            from { transform: scale(0.5); opacity: 1; }
+            to { transform: scale(1.4); opacity: 0; }
+        }
+
+        /* 卡片序号角标 01-06 */
+        .game-grid { counter-reset: gameno; }
+        .game-card::after {
+            counter-increment: gameno; content: '0' counter(gameno);
+            position: absolute; top: 10px; right: 14px;
+            font-family: 'Passion One', 'BLZh', 'BLJa', sans-serif;
+            font-size: 24px; color: var(--accent, var(--bl-gold));
+            transform: rotate(8deg); opacity: 0.9;
+        }
+
+        /* 步骤卡之间的箭头 */
+        .step-card { position: relative; }
+        body.theme-bl .step-card:not(:last-child)::after {
+            content: '➜'; position: absolute; right: -27px; top: 50%;
+            transform: translateY(-50%); font-size: 30px; z-index: 6;
+            color: var(--bl-offwhite); text-shadow: 2px 2px 0 rgba(0,0,0,0.6);
+        }
+
+        /* 招募卡 JOIN US 角标 */
+        body.theme-bl #recruitment-section { position: relative; }
+        body.theme-bl #recruitment-section::after {
+            content: 'JOIN US!'; position: absolute; top: -18px; right: 26px;
+            background: var(--bl-gold); color: var(--bl-offblack);
+            border: 3px solid #1E1E1F; box-shadow: 4px 4px 0 rgba(0,0,0,0.85);
+            padding: 4px 14px; font-size: 20px; letter-spacing: 2px;
+            font-family: 'Passion One', 'BLZh', 'BLJa', sans-serif;
+            transform: rotate(6deg);
+        }
+
+        /* 缎带悬浮暂停 */
+        body.theme-bl .marquee:hover .marquee-inner { animation-play-state: paused; }
+
+        /* 统计数字后缀 + */
+        .stat-num[data-suffix]::after {
+            content: attr(data-suffix);
+            font-size: 0.55em; vertical-align: 0.35em;
+        }
+
         @media (max-width: 768px) {
             .bl-stats { grid-template-columns: repeat(2, 1fr); }
             body.theme-bl .band { padding: 55px 16px; }
+            /* 移动端:卡片错位边距复位,保留歪斜感 */
+            body.theme-bl .game-card { margin-left: 0 !important; margin-right: 0 !important; margin-top: 0 !important; }
+            body.theme-bl .step-card:not(:last-child)::after { display: none; }
+            body.theme-bl .season-badge { right: 4%; bottom: 30px; font-size: 16px; padding: 4px 12px; }
+            .float-item { font-size: 26px; }
+            /* 竖屏手机适配 */
+            nav { padding: 0 8px; overflow-x: auto; }
+            #nav-title { font-size: 14px; }
+            body.theme-bl nav { height: 52px; }
+            body.theme-bl #nav-title { font-size: 16px; letter-spacing: 1px; }
+            .nav-controls .button { font-size: 10px; height: 26px; padding: 0 6px 2px 6px; white-space: nowrap; }
+            .nav-divider { margin: 0 1px; }
+            .hero { height: 34vh; min-height: 210px; }
+            .logo-img { max-width: 84vw; }
+            .bl-ipbar { flex-wrap: wrap; justify-content: center; gap: 8px; text-align: center; }
+            .bl-ipbar .ip-value { font-size: 17px; word-break: break-all; }
+            .marquee-inner span { font-size: 16px; }
         }
     </style>
 </head>
@@ -510,12 +616,16 @@
         <span id="nav-title" class="bl-hl">SHIVR-DEV STUDIO</span>
     </span>
     <span class="nav-controls">
+        <a class="button" href="./ideas.html" title="玩法实验室 IDEAS LAB" style="text-decoration:none;">🧪 LAB</a>
+        <span class="nav-divider"></span>
         <button class="button" id="btn-theme-ore" onclick="setTheme('ore')">ORE</button>
         <button class="button" id="btn-theme-bl" onclick="setTheme('bl')">BL</button>
         <span class="nav-divider"></span>
         <button class="button" id="btn-lang-zh" onclick="setLang('zh')">中文</button>
         <button class="button" id="btn-lang-en" onclick="setLang('en')">EN</button>
         <button class="button" id="btn-lang-ja" onclick="setLang('ja')">日本語</button>
+        <span class="nav-divider"></span>
+        <button class="button" onclick="UiDebug.toggle()" title="调试界面位置/尺寸/文字"> 调试</button>
     </span>
 </nav>
 
@@ -525,12 +635,19 @@
     <div class="logo-container">
         <img src="logo.png" id="hero-logo" class="logo-img" alt="Logo" style="min-width:200px; min-height:100px;">
     </div>
+    <span class="float-item bl-only" style="left:11%; top:22%; animation-duration:5.2s;">⚔️</span>
+    <span class="float-item bl-only" style="left:21%; top:64%; animation-duration:6.4s; animation-delay:0.8s;">🏆</span>
+    <span class="float-item bl-only" style="right:13%; top:26%; animation-duration:5.8s; animation-delay:0.4s;">🚩</span>
+    <span class="float-item bl-only" style="right:21%; top:60%; animation-duration:7s; animation-delay:1.2s;">🏁</span>
+    <span class="float-item bl-only" style="left:46%; top:12%; animation-duration:4.6s; animation-delay:0.2s;">⭐</span>
+    <div class="season-badge bl-only bl-hl" data-key="season_badge">SEASON 1</div>
     <div class="scroll-cue">▼</div>
 </section>
 
 <!-- ===== BL 主题专属区块(Ore 主题下自动隐藏) ===== -->
 <div class="bl-only bl-ipbar">
     <span class="ip-label bl-hl" data-key="ip_label">SERVER IP</span>
+    <span class="live-dot"></span>
     <span class="ip-value bl-hl">PLAY.BLOCKLEGENDS.NET</span>
     <button class="button" onclick="copyIp()" data-key="ip_btn">复制 IP</button>
 </div>
@@ -581,8 +698,8 @@
 <div class="band band-red bl-only"><div class="bl-section" style="padding:0;">
     <div class="bl-stats">
         <div class="stat-item"><div class="stat-num bl-hl" data-count="6">0</div><div class="stat-label" data-key="st1_l"></div></div>
-        <div class="stat-item"><div class="stat-num bl-hl" data-count="32">0</div><div class="stat-label" data-key="st2_l"></div></div>
-        <div class="stat-item"><div class="stat-num bl-hl" data-count="128">0</div><div class="stat-label" data-key="st3_l"></div></div>
+        <div class="stat-item"><div class="stat-num bl-hl" data-count="32" data-suffix="+">0</div><div class="stat-label" data-key="st2_l"></div></div>
+        <div class="stat-item"><div class="stat-num bl-hl" data-count="128" data-suffix="+">0</div><div class="stat-label" data-key="st3_l"></div></div>
         <div class="stat-item"><div class="stat-num bl-hl" data-count="1">0</div><div class="stat-label" data-key="st4_l"></div></div>
     </div>
 </div></div>
@@ -615,7 +732,7 @@
         <div class="panel-title bl-hl" data-key="p1_title">开发进展</div>
         <img src="progress.png" id="p1-img" style="width:100%; height:140px; object-fit:cover; border:2px solid #000; margin-bottom:15px; background:#111;">
         <p data-key="p1_desc" style="color:#ccc; font-size:14px; line-height:1.7; margin:0 0 15px; display:none;"></p>
-        <a href="https://shivr-dev.github.io/ideas/" class="button green" onclick="playSfx('snd-button')" data-key="p1_btn">查看想法实验室</a>
+        <a href="./ideas.html" class="button green" onclick="playSfx('snd-button')" data-key="p1_btn">查看想法实验室</a>
     </div>
 
     <div class="ore-panel">
@@ -778,6 +895,7 @@
                 mq_text: '★ BLOCK LEGENDS ★ 第一赛季 火热报名中 ★ 六款轮换小游戏 ★ 32 支队伍 ★ 128 名选手 ★ 冠军留名石碑 ★ BLOCK LEGENDS ★ 第一赛季 火热报名中 ★ 六款轮换小游戏 ★ 32 支队伍 ★ 128 名选手 ★ 冠军留名石碑 ',
                 st1_l: '轮换小游戏', st2_l: '参赛队伍', st3_l: '活跃选手', st4_l: '赛季冠军',
                 p2_desc: '想报名下一赛季,或洽谈赞助与联动?联系运营团队,或直接提交下方的招募申请。',
+                season_badge: '第一赛季',
                 p2_title: '快捷联系', p2_btn: '显示运营团队', p2_emoji: '🏆',
                 rec_title: 'BUILDER / 开发者招募 (RECRUITMENT)',
                 rec_desc: '填写下方信息申请加入 Block Legends 建设团队(地图建筑 / 小游戏开发 / UI 美术)。审核通过后,即可在主控台登录。',
@@ -818,6 +936,7 @@
                 mq_text: '★ BLOCK LEGENDS ★ SEASON 1 — SIGN-UPS OPEN ★ SIX ROTATING MINIGAMES ★ 32 TEAMS ★ 128 PLAYERS ★ CHAMPIONS ON THE MONUMENT ★ BLOCK LEGENDS ★ SEASON 1 — SIGN-UPS OPEN ★ SIX ROTATING MINIGAMES ★ 32 TEAMS ★ 128 PLAYERS ★ CHAMPIONS ON THE MONUMENT ',
                 st1_l: 'MINIGAMES', st2_l: 'TEAMS', st3_l: 'PLAYERS', st4_l: 'CHAMPION',
                 p2_desc: 'Want to join the next season, or talk sponsorship and collabs? Reach the staff team — or apply below.',
+                season_badge: 'SEASON 1',
                 p2_title: 'QUICK CONTACT', p2_btn: 'Show Staff Team', p2_emoji: '🏆',
                 rec_title: 'BUILDER / DEV RECRUITMENT',
                 rec_desc: 'Apply below to join the Block Legends build team (map building / minigame dev / UI art). Once approved, you can log in on the console.',
@@ -858,6 +977,7 @@
                 mq_text: '★ BLOCK LEGENDS ★ シーズン1 参加受付中 ★ 6つのミニゲーム ★ 32チーム ★ 128名のプレイヤー ★ チャンピオンは石碑に名を刻む ★ BLOCK LEGENDS ★ シーズン1 参加受付中 ★ 6つのミニゲーム ★ 32チーム ★ 128名のプレイヤー ★ チャンピオンは石碑に名を刻む ',
                 st1_l: 'ミニゲーム', st2_l: '参加チーム', st3_l: 'プレイヤー', st4_l: 'チャンピオン',
                 p2_desc: '次シーズンの参加やスポンサー・コラボの相談は運営チームへ。または下のフォームから応募してください。',
+                season_badge: 'シーズン1',
                 p2_title: '連絡先', p2_btn: '運営チームを表示', p2_emoji: '🏆',
                 rec_title: 'ビルダー / 開発者募集 (RECRUITMENT)',
                 rec_desc: '下記のフォームから Block Legends 建設チーム(マップ制作 / ミニゲーム開発 / UI アート)に応募できます。承認後、コンソールにログインできます。',
@@ -1076,5 +1196,398 @@
     const AUTH_REPO = 'ideas-data';
 
 </script>
+<script>
+/* ============================================================
+   UI 调试工具(管理员专用)
+   - 仅管理员可用
+   - 点击页面任意元素 → 调整位置、尺寸、字号、等比缩放、旋转、
+     颜色、圆角、不透明度、隐藏,或直接改文字
+   - 「 导出文件」生成 debug-overrides.json 可发给开发者固化
+   - 「☁️ 发布到服务器」把调整存进 GitHub 数据仓库,所有访客自动生效
+   ============================================================ */
+(function () {
+    if (window.__uiDebugLoaded) return;
+    window.__uiDebugLoaded = true;
+
+    // ---- GitHub 数据仓库(与投票/BL 数据同库,不同 Issue) ----
+    const DBG_OWNER = 'shivr-dev';
+    const DBG_REPO = 'ideas';
+    const DBG_ISSUE_TITLE = '[DEBUG] UI 调整数据';
+    const _dp1 = 'ghp_', _dp2 = '9LZtot1qgVw1k1FSQVSSCIDlDlpJqL2rSs2D';
+    const DBG_TOKEN = _dp1 + _dp2;
+    const API_HEADERS = { 'Authorization': 'token ' + DBG_TOKEN, 'Content-Type': 'application/json' };
+
+    const PAGE = location.pathname.split('/').pop() || 'index.html';
+    const STORE_KEY = 'ui-debug-' + location.pathname;
+
+    let active = false, selected = null, hovered = null;
+    let changes = {};
+    let serverIssueNumber = null;
+
+    function isAdmin() {
+        // 1) 勾选过「记住我」的持久登录(跨页面有效,含主页)
+        if (localStorage.getItem('userRole') === 'admin') return true;
+        // 2) 本页面当前会话已登录管理员(未勾「记住我」的情况)
+        try { if (typeof currentUserRole !== 'undefined' && currentUserRole === 'admin') return true; } catch (e) {}
+        return false;
+    }
+
+    // ---------- 注入样式 ----------
+    const css = `
+    #dbgPanel { position:fixed; right:12px; bottom:12px; width:300px; max-height:84vh; overflow-y:auto; z-index:99999; background:#2b2d30; color:#eee; border:3px solid #000; box-shadow:6px 6px 0 rgba(0,0,0,.6); font:13px/1.5 system-ui,-apple-system,sans-serif; padding:12px; display:none; }
+    #dbgPanel * { box-sizing:border-box; font:inherit; }
+    #dbgPanel h3 { margin:0 0 8px; font-size:14px; color:#FFD829; }
+    #dbgPanel .dbg-row { margin-bottom:8px; }
+    #dbgPanel label { display:block; font-size:11px; color:#aaa; margin-bottom:2px; }
+    #dbgPanel input[type=number], #dbgPanel textarea { width:100%; background:#1b1c1e; color:#fff; border:2px solid #000; padding:5px 7px; }
+    #dbgPanel input[type=color] { width:100%; height:30px; padding:0; border:2px solid #000; background:#1b1c1e; cursor:pointer; }
+    #dbgPanel textarea { min-height:60px; resize:vertical; }
+    #dbgPanel .dbg-grid { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+    #dbgPanel button { background:#3C69F0; color:#fff; border:2px solid #000; padding:6px 10px; cursor:pointer; font-weight:bold; margin:2px 2px 2px 0; }
+    #dbgPanel button:hover { filter:brightness(1.15); }
+    #dbgPanel .dbg-warn { background:#C33636; }
+    #dbgPanel .dbg-gray { background:#5A5B5C; }
+    #dbgPanel .dbg-pub { background:#3C8527; width:100%; margin-top:4px; }
+    #dbgPanel .dbg-sel { font-size:11px; color:#8fb0ff; word-break:break-all; background:#1b1c1e; border:2px solid #000; padding:4px 6px; max-height:64px; overflow:auto; }
+    .dbg-hover { outline:2px dashed #E0262C !important; outline-offset:2px; cursor:crosshair !important; }
+    .dbg-picked { outline:3px solid #FFD829 !important; outline-offset:2px; }
+    #dbgBadge { position:fixed; left:12px; bottom:12px; z-index:99998; background:#E0262C; color:#fff; border:3px solid #000; padding:6px 12px; font:bold 12px system-ui; display:none; box-shadow:4px 4px 0 rgba(0,0,0,.5); pointer-events:none; }
+    `;
+    const st = document.createElement('style');
+    st.textContent = css;
+    document.head.appendChild(st);
+
+    // ---------- 面板 ----------
+    const panel = document.createElement('div');
+    panel.id = 'dbgPanel';
+    panel.innerHTML = `
+        <h3> UI 调试面板(管理员)</h3>
+        <div class="dbg-row"><label>已选元素(调试模式下点击页面任意元素)</label><div class="dbg-sel" id="dbgSel">未选择</div></div>
+        <div class="dbg-row"><label>文字内容(支持 HTML,如 &lt;br&gt;)</label><textarea id="dbgText" placeholder="选择元素后可编辑文字"></textarea></div>
+        <div class="dbg-row dbg-grid">
+            <div><label>X 偏移 (px)</label><input type="number" id="dbgX" value="0"></div>
+            <div><label>Y 偏移 (px)</label><input type="number" id="dbgY" value="0"></div>
+            <div><label>宽度 (px,空=自动)</label><input type="number" id="dbgW" placeholder="auto"></div>
+            <div><label>高度 (px,空=自动)</label><input type="number" id="dbgH" placeholder="auto"></div>
+            <div><label>字号 (px,空=默认)</label><input type="number" id="dbgFs" placeholder="默认"></div>
+            <div><label>圆角 (px,空=默认)</label><input type="number" id="dbgBr" placeholder="默认"></div>
+            <div><label>等比缩放 (%,100=原始)</label><input type="number" id="dbgSc" value="100"></div>
+            <div><label>旋转 (°,0=不转)</label><input type="number" id="dbgRot" value="0"></div>
+            <div><label>不透明度 (%,100=原始)</label><input type="number" id="dbgOp" value="100"></div>
+            <div style="display:flex;align-items:flex-end;"><label style="display:flex;align-items:center;gap:6px;color:#eee;cursor:pointer;margin:0 0 6px;"><input type="checkbox" id="dbgHide" style="width:auto;"> 隐藏此元素</label></div>
+        </div>
+        <div class="dbg-row dbg-grid">
+            <div><label>文字颜色(选色即生效)</label><input type="color" id="dbgColor" value="#ffffff"></div>
+            <div><label>背景颜色(选色即生效)</label><input type="color" id="dbgBg" value="#888888"></div>
+        </div>
+        <div class="dbg-row">
+            <button id="dbgApplyText">应用文字</button>
+            <button id="dbgResetOne" class="dbg-gray">还原此元素记录</button>
+        </div>
+        <hr style="border:1px solid #444;">
+        <div class="dbg-row">
+            <button id="dbgExport"> 导出文件</button>
+            <button id="dbgImportBtn"> 导入</button>
+            <input type="file" id="dbgImportFile" accept=".json" style="display:none">
+            <button id="dbgClear" class="dbg-warn"> 清除全部</button>
+            <button id="dbgClose" class="dbg-gray">关闭调试</button>
+            <button id="dbgPublish" class="dbg-pub">☁️ 发布到服务器(所有访客可见)</button>
+            <div id="dbgPubStatus" style="font-size:11px;margin-top:4px;"></div>
+        </div>
+        <div style="font-size:11px;color:#888;line-height:1.6;">改动实时生效并存于本浏览器;点「发布到服务器」后所有访客自动应用。「导出文件」生成 debug-overrides.json 可发给开发者固化进代码。</div>
+    `;
+    const badge = document.createElement('div');
+    badge.id = 'dbgBadge';
+    badge.textContent = ' 调试模式:点击任意元素';
+
+    // ---------- 选择器工具 ----------
+    const STATE_CLASSES = ['on', 'sw-active', 'rv', 'revealed', 'dbg-hover', 'dbg-picked', 'active', 'show', 'open'];
+    function stableClasses(el) {
+        return [...el.classList].filter(c => STATE_CLASSES.indexOf(c) === -1 && !/^lang-/.test(c) && !/^theme-/.test(c));
+    }
+    function selectorOf(el) {
+        if (el.id) return '#' + CSS.escape(el.id);
+        const parts = [];
+        let cur = el;
+        while (cur && cur !== document.body && cur !== document.documentElement) {
+            if (cur.id) { parts.unshift('#' + CSS.escape(cur.id)); break; }
+            let seg = cur.tagName.toLowerCase();
+            const cls = stableClasses(cur);
+            if (cls.length) seg += '.' + cls.slice(0, 2).map(c => CSS.escape(c)).join('.');
+            const parent = cur.parentElement;
+            if (parent) {
+                const same = [...parent.children].filter(c => c.tagName === cur.tagName);
+                if (same.length > 1) seg += ':nth-of-type(' + (same.indexOf(cur) + 1) + ')';
+            }
+            parts.unshift(seg);
+            cur = parent;
+        }
+        return parts.join(' > ');
+    }
+    function labelOf(el) {
+        const txt = (el.textContent || '').trim().replace(/\s+/g, ' ').slice(0, 24);
+        return '<' + el.tagName.toLowerCase() + '> ' + txt;
+    }
+
+    // ---------- 应用改动 ----------
+    function applyTransform(el, c) {
+        // 首次应用缩放/旋转时,先记录元素原有的 transform(如卡片的倾斜),在其基础上叠加
+        if (el.dataset.dbgBase === undefined) el.dataset.dbgBase = getComputedStyle(el).transform;
+        const base = (el.dataset.dbgBase === 'none' ? '' : el.dataset.dbgBase + ' ');
+        const sc = (c.sc !== undefined ? c.sc : 100) / 100;
+        const rot = c.rot || 0;
+        if (sc === 1 && !rot) { el.style.transform = (el.dataset.dbgBase === 'none' ? '' : el.dataset.dbgBase); return; }
+        el.style.transform = base + (sc !== 1 ? 'scale(' + sc + ') ' : '') + (rot ? 'rotate(' + rot + 'deg)' : '');
+    }
+    function applyOne(sel, c) {
+        const el = document.querySelector(sel);
+        if (!el) return;
+        if (c.text !== undefined) el.innerHTML = c.text;
+        if (c.x || c.y) {
+            if (getComputedStyle(el).position === 'static') el.style.position = 'relative';
+            el.style.left = (c.x || 0) + 'px';
+            el.style.top = (c.y || 0) + 'px';
+        }
+        if (c.w) el.style.width = c.w + 'px';
+        if (c.h) el.style.height = c.h + 'px';
+        if (c.fs) el.style.fontSize = c.fs + 'px';
+        if (c.br) el.style.borderRadius = c.br + 'px';
+        if (c.sc !== undefined || c.rot !== undefined) applyTransform(el, c);
+        if (c.op !== undefined && c.op !== 100) el.style.opacity = String(c.op / 100);
+        if (c.color) el.style.color = c.color;
+        if (c.bg) el.style.backgroundColor = c.bg;
+        if (c.hide === true) el.style.display = 'none';
+        else if (c.hide === false) el.style.display = '';
+    }
+    function applyAll() { Object.keys(changes).forEach(sel => applyOne(sel, changes[sel])); }
+    function save() { localStorage.setItem(STORE_KEY, JSON.stringify(changes)); }
+
+    // ---------- 服务器同步(GitHub Issue 存储) ----------
+    async function findDbgIssue() {
+        const r = await fetch('https://api.github.com/repos/' + DBG_OWNER + '/' + DBG_REPO + '/issues?state=open&per_page=100&_t=' + Date.now(), { headers: API_HEADERS, cache: 'no-store' });
+        if (!r.ok) return null;
+        const list = await r.json();
+        return list.find(i => i.title === DBG_ISSUE_TITLE) || null;
+    }
+    async function loadServer() {
+        // 所有访客都会执行:拉取已发布的调整并应用
+        try {
+            const found = await findDbgIssue();
+            if (!found) return;
+            serverIssueNumber = found.number;
+            const j = JSON.parse(found.body || '{}');
+            const list = (j.pages && j.pages[PAGE]) || [];
+            list.forEach(c => { if (c.selector) applyOne(c.selector, c); });
+            // 管理员:把服务器已发布的合并进本地全集(本地优先),
+            // 保证再次发布时是完整合集,旧改动不会被覆盖丢失
+            if (isAdmin() && list.length) {
+                const local = JSON.parse(localStorage.getItem(STORE_KEY) || '{}');
+                list.forEach(c => { if (c.selector && !local[c.selector]) local[c.selector] = c; });
+                localStorage.setItem(STORE_KEY, JSON.stringify(local));
+            }
+        } catch (e) { /* 无数据或网络失败,忽略 */ }
+    }
+    async function publish() {
+        const stEl = document.getElementById('dbgPubStatus');
+        stEl.style.color = '#FFD829';
+        stEl.textContent = '☁️ 发布中...';
+        try {
+            let pages = {};
+            const found = await findDbgIssue();
+            if (found) {
+                serverIssueNumber = found.number;
+                try { pages = JSON.parse(found.body || '{}').pages || {}; } catch (e) { pages = {}; }
+            }
+            pages[PAGE] = Object.values(changes);
+            const body = JSON.stringify({ pages: pages, updatedAt: new Date().toISOString() });
+            let r;
+            if (serverIssueNumber) {
+                r = await fetch('https://api.github.com/repos/' + DBG_OWNER + '/' + DBG_REPO + '/issues/' + serverIssueNumber,
+                    { method: 'PATCH', headers: API_HEADERS, body: JSON.stringify({ body: body }) });
+            } else {
+                r = await fetch('https://api.github.com/repos/' + DBG_OWNER + '/' + DBG_REPO + '/issues',
+                    { method: 'POST', headers: API_HEADERS, body: JSON.stringify({ title: DBG_ISSUE_TITLE, body: body }) });
+                if (r.ok) { const nj = await r.json(); serverIssueNumber = nj.number; }
+            }
+            if (r.ok) {
+                stEl.style.color = '#7fd77f';
+                stEl.textContent = '✅ 已发布!所有访客刷新后自动生效 (' + new Date().toLocaleTimeString() + ')';
+            } else {
+                stEl.style.color = '#f77';
+                stEl.textContent = '❌ 发布失败:HTTP ' + r.status;
+            }
+        } catch (e) {
+            stEl.style.color = '#f77';
+            stEl.textContent = '❌ 发布失败:' + e.message;
+        }
+    }
+
+    // ---------- 载入:服务器已发布的 → 本机未发布的(本机优先) ----------
+    async function loadAndApply() {
+        await loadServer();
+        try { changes = JSON.parse(localStorage.getItem(STORE_KEY) || '{}'); } catch (e) { changes = {}; }
+        applyAll();
+    }
+
+    // ---------- 选择交互 ----------
+    function onMove(e) {
+        if (!active) return;
+        if (panel.contains(e.target)) return;
+        if (hovered && hovered !== selected) hovered.classList.remove('dbg-hover');
+        hovered = e.target;
+        if (hovered !== selected) hovered.classList.add('dbg-hover');
+    }
+    function onPick(e) {
+        if (!active) return;
+        if (panel.contains(e.target)) return;
+        e.preventDefault();
+        e.stopPropagation();
+        if (selected) selected.classList.remove('dbg-picked');
+        selected = e.target;
+        selected.classList.add('dbg-picked');
+        selected.classList.remove('dbg-hover');
+        fillPanel();
+    }
+    function fillPanel() {
+        const sel = selectorOf(selected);
+        const c = changes[sel] || {};
+        document.getElementById('dbgSel').textContent = sel;
+        document.getElementById('dbgText').value = selected.innerHTML;
+        document.getElementById('dbgX').value = c.x || 0;
+        document.getElementById('dbgY').value = c.y || 0;
+        document.getElementById('dbgW').value = c.w || '';
+        document.getElementById('dbgH').value = c.h || '';
+        document.getElementById('dbgFs').value = c.fs || '';
+        document.getElementById('dbgBr').value = c.br || '';
+        document.getElementById('dbgSc').value = c.sc !== undefined ? c.sc : 100;
+        document.getElementById('dbgRot').value = c.rot || 0;
+        document.getElementById('dbgOp').value = c.op !== undefined ? c.op : 100;
+        document.getElementById('dbgHide').checked = !!c.hide;
+    }
+    function recordFromInputs() {
+        if (!selected) return null;
+        const sel = selectorOf(selected);
+        const c = changes[sel] || { label: labelOf(selected), selector: sel };
+        c.selector = sel;
+        c.x = +document.getElementById('dbgX').value || 0;
+        c.y = +document.getElementById('dbgY').value || 0;
+        c.w = +document.getElementById('dbgW').value || 0;
+        c.h = +document.getElementById('dbgH').value || 0;
+        c.fs = +document.getElementById('dbgFs').value || 0;
+        c.br = +document.getElementById('dbgBr').value || 0;
+        c.sc = +document.getElementById('dbgSc').value || 100;
+        c.rot = +document.getElementById('dbgRot').value || 0;
+        c.op = +document.getElementById('dbgOp').value || 100;
+        c.hide = document.getElementById('dbgHide').checked;
+        changes[sel] = c;
+        return c;
+    }
+
+    // ---------- 导入导出 ----------
+    function exportJson() {
+        const payload = { page: PAGE, exportedAt: new Date().toISOString(), changes: Object.values(changes) };
+        const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'debug-overrides.json';
+        a.click();
+        URL.revokeObjectURL(a.href);
+    }
+    function importJson(ev) {
+        const f = ev.target.files[0];
+        if (!f) return;
+        const rd = new FileReader();
+        rd.onload = () => {
+            try {
+                const j = JSON.parse(rd.result);
+                (j.changes || []).forEach(c => { if (c.selector) { changes[c.selector] = c; applyOne(c.selector, c); } });
+                save();
+                alert('导入成功,已应用 ' + (j.changes || []).length + ' 项调整');
+            } catch (e) { alert('文件格式错误'); }
+        };
+        rd.readAsText(f);
+        ev.target.value = '';
+    }
+
+    // ---------- 开关(仅管理员) ----------
+    function toggle(force) {
+        const want = force !== undefined ? force : !active;
+        if (want && !isAdmin()) {
+            alert(' 调试功能仅管理员可用。\n请先在「玩法实验室」登录管理员账号(隐藏入口)。\n如需在主页也能调试,登录时请勾选「记住我」。');
+            return;
+        }
+        active = want;
+        panel.style.display = active ? 'block' : 'none';
+        badge.style.display = active ? 'block' : 'none';
+        if (!active) {
+            if (hovered) hovered.classList.remove('dbg-hover');
+            if (selected) selected.classList.remove('dbg-picked');
+            hovered = selected = null;
+        }
+    }
+    window.UiDebug = { toggle: toggle };
+
+    // ---------- 启动 ----------
+    document.addEventListener('DOMContentLoaded', function () {
+        document.body.appendChild(panel);
+        document.body.appendChild(badge);
+        loadAndApply();
+
+        document.addEventListener('mousemove', onMove, true);
+        document.addEventListener('click', onPick, true);
+        document.addEventListener('keydown', function (e) {
+            if (e.ctrlKey && e.shiftKey && (e.key === 'D' || e.key === 'd')) { e.preventDefault(); toggle(); }
+        });
+
+        ['dbgX', 'dbgY', 'dbgW', 'dbgH', 'dbgFs', 'dbgBr', 'dbgSc', 'dbgRot', 'dbgOp'].forEach(id => {
+            document.getElementById(id).addEventListener('input', function () {
+                const c = recordFromInputs();
+                if (c) { applyOne(c.selector, c); save(); }
+            });
+        });
+        document.getElementById('dbgHide').addEventListener('change', function () {
+            const c = recordFromInputs();
+            if (c) { applyOne(c.selector, c); save(); }
+        });
+        document.getElementById('dbgColor').addEventListener('input', function () {
+            const c = recordFromInputs();
+            if (c) { c.color = this.value; applyOne(c.selector, c); save(); }
+        });
+        document.getElementById('dbgBg').addEventListener('input', function () {
+            const c = recordFromInputs();
+            if (c) { c.bg = this.value; applyOne(c.selector, c); save(); }
+        });
+        document.getElementById('dbgApplyText').onclick = function () {
+            if (!selected) return;
+            const sel = selectorOf(selected);
+            const c = changes[sel] || { label: labelOf(selected), selector: sel };
+            c.selector = sel;
+            c.text = document.getElementById('dbgText').value;
+            changes[sel] = c;
+            applyOne(sel, c);
+            save();
+        };
+        document.getElementById('dbgResetOne').onclick = function () {
+            if (!selected) return;
+            delete changes[selectorOf(selected)];
+            save();
+            fillPanel();
+        };
+        document.getElementById('dbgClear').onclick = function () {
+            if (!confirm('清除本页所有调试改动并刷新?(已发布到服务器的不受影响,重新发布即可覆盖)')) return;
+            changes = {};
+            save();
+            location.reload();
+        };
+        document.getElementById('dbgClose').onclick = function () { toggle(false); };
+        document.getElementById('dbgExport').onclick = exportJson;
+        document.getElementById('dbgImportBtn').onclick = function () { document.getElementById('dbgImportFile').click(); };
+        document.getElementById('dbgImportFile').addEventListener('change', importJson);
+        document.getElementById('dbgPublish').onclick = publish;
+    });
+})();
+</script>
+
+
 </body>
 </html>

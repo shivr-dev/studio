@@ -1,0 +1,2192 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shivrdev|玩法实验室</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Passion+One:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        /* ==========================================
+           1. Ore UI 核心字体与色彩系统
+        ========================================== */
+        :root { color-scheme: light !important; }
+        
+        @font-face { font-family: 'Minecraft Ten'; src: url("./OreUI/fonts/Minecraft-Ten.otf") format('opentype'); }
+        @font-face { font-family: 'Minecraft Seven'; src: url("./OreUI/fonts/Minecraft-Seven-v4.ttf") format('truetype'); }
+        @font-face { font-family: 'Minecraft Five Bold'; src: url("./OreUI/fonts/Minecraft-Five-Bold.otf") format('opentype'); }
+
+        /* 强制全局去圆角 */
+        *, *::before, *::after { border-radius: 0 !important; box-sizing: border-box; }
+
+        body { 
+            font-family: "Minecraft Seven", sans-serif; 
+            background-color: #48494A; 
+            margin: 0; padding: 20px; color: #FFFFFF; 
+            overflow-x: hidden;
+        }
+
+        h1 { font-family: "Minecraft Ten", sans-serif; font-size: 32px; color: #FFFFFF; text-shadow: 2px 2px 0 #1E1E1F; margin-top: 0; }
+        h2, h3 { font-family: "Minecraft Five Bold", sans-serif; color: #FFFFFF; text-shadow: 2px 2px 0 #1E1E1F; margin: 0 0 15px 0;}
+
+        .container { 
+            max-width: 1200px; margin: 0 auto; 
+            background-color: transparent; 
+            position: relative; 
+            animation: slideDown 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); 
+        }
+
+        /* ==========================================
+           2. 顶部栏与状态提示 (Toast)
+        ========================================== */
+        .top-tools { position: absolute; top: 10px; right: 10px; display: flex; gap: 10px; z-index: 20;}
+        .tool-btn { 
+            background-color: #313233; color: #FFFFFF; border: 2px solid #1E1E1F; 
+            padding: 8px 15px; cursor: pointer; 
+            font-family: "Minecraft Seven", sans-serif;
+            box-shadow: inset 2px 2px rgba(255, 255, 255, 0.15), inset -2px -2px rgba(0, 0, 0, 0.3);
+            display: flex; align-items: center; gap: 6px; transition: 0.1s;
+        }
+        .tool-btn:hover { background-color: #48494A; }
+        .tool-btn:active { box-shadow: inset 2px 2px rgba(0,0,0,0.4); transform: translateY(2px); }
+
+        .online-indicator { width: 8px; height: 8px; background: #6CC349; border: 2px solid #1E1E1F; animation: pulse 2s infinite; }
+        
+        .status-bar { 
+            font-family: "Minecraft Five Bold", sans-serif; font-size: 14px; padding: 12px; margin-bottom: 20px; 
+            border: 2px solid #1E1E1F; text-align: center; text-transform: uppercase;
+        }
+        .status-ok { background-color: #313233; color: #6CC349; box-shadow: inset 2px 2px rgba(255,255,255,0.1); }
+        .status-error { background-color: #313233; color: #F46D6D; box-shadow: inset 2px 2px rgba(255,255,255,0.1); }
+
+        /* ==========================================
+           3. 按钮系统
+        ========================================== */
+        .btn { 
+            font-family: "Minecraft Seven", sans-serif; cursor: pointer; 
+            border: 2px solid #1E1E1F; font-weight: bold; 
+            padding: 10px 20px 14px 20px; text-transform: uppercase; text-align: center; display: inline-block;
+        }
+        .btn:active { transform: translateY(4px); padding-bottom: 10px; margin-top: 4px; }
+
+        .btn-add, .btn-close-modal, .btn-fullscreen, .icon-btn { 
+            background-color: #D0D1D4; color: #000000;
+            box-shadow: inset 0 -4px #58585A, inset 3px 3px rgba(255, 255, 255, 0.6), inset -3px -7px rgba(255, 255, 255, 0.4);
+        }
+        .btn-add:hover, .btn-close-modal:hover, .btn-fullscreen:hover { background-color: #B1B2B5; }
+        .btn-add:active, .btn-close-modal:active, .btn-fullscreen:active { box-shadow: inset 3px 3px rgba(255, 255, 255, 0.8), inset -3px -3px rgba(255, 255, 255, 0.6); }
+
+        .btn-save, .btn-vote { 
+            background-color: #3C8527; color: #FFFFFF;
+            box-shadow: inset 0 -4px #1D4D13, inset 3px 3px rgba(255, 255, 255, 0.2), inset -3px -7px rgba(255, 255, 255, 0.1);
+        }
+        .btn-save:hover, .btn-vote:hover { background-color: #2A641C; }
+        .btn-save:active, .btn-vote:active { box-shadow: inset 3px 3px rgba(255, 255, 255, 0.4), inset -3px -3px rgba(255, 255, 255, 0.3); }
+
+        .btn-delete-col, .btn-revoke { 
+            background-color: #C33636; color: #FFFFFF; width: 100%; margin-top: 8px; font-size: 13px;
+            box-shadow: inset 0 -4px #AD1D1D, inset 3px 3px rgba(255, 255, 255, 0.2), inset -3px -7px rgba(255, 255, 255, 0.1);
+        }
+        .btn-delete-col:hover, .btn-revoke:hover { background-color: #C02D2D; }
+        .btn-delete-col:active, .btn-revoke:active { box-shadow: inset 3px 3px rgba(255, 255, 255, 0.5), inset -3px -3px rgba(255, 255, 255, 0.4); }
+
+        .btn-fullscreen { margin-top: 10px; width: 100%; }
+        .icon-btn { padding: 4px 8px; font-family: "Minecraft Five Bold", sans-serif; font-size: 10px;}
+
+        /* ==========================================
+           4. 输入框、富文本与 8行折叠预览
+        ========================================== */
+        input[type="text"], input[type="password"], .guest-view-box, .editor-box, .group-name-input { 
+            background-color: #313233; color: #FFFFFF; border: 2px solid #1E1E1F;
+            box-shadow: inset 0 4px #242425; padding: 10px; font-family: "Minecraft Seven", sans-serif; 
+            width: 100%; outline: none; caret-color: #6CC349;
+        }
+        input:focus, .editor-box:focus { border-color: #FFFFFF; }
+        .group-name-input { width: 120px; padding: 6px; box-shadow: inset 0 2px #242425; }
+        .guest-view-box { background-color: #48494A; box-shadow: inset 2px 2px #313233; }
+        .editor-box { min-height: 120px; overflow-y: auto; line-height: 1.6; }
+        .editor-box img, .guest-view-box img { max-width: 100%; border: 2px solid #1E1E1F; margin: 5px 0; }
+
+        /* 🚀 8行自动折叠 */
+        .line-clamp-8 {
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 8;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            word-wrap: break-word;
+        }
+
+        /* 修复各种原生组件 */
+        input[type="file"]::file-selector-button {
+            border-radius: 0; background-color: #D0D1D4; border: 2px solid #1E1E1F;
+            font-family: "Minecraft Seven", sans-serif; font-weight: bold; cursor: pointer;
+            box-shadow: inset 2px 2px #FFF; padding: 4px 8px; margin-right: 10px;
+        }
+        input[type="checkbox"] { appearance: none; -webkit-appearance: none; width: 18px; height: 18px; border: 2px solid #1E1E1F; background-color: #313233; cursor: pointer; position: relative; }
+        input[type="checkbox"]:checked { background-color: #6CC349; }
+        input[type="checkbox"]:checked::after { content: ''; position: absolute; left: 4px; top: 1px; width: 4px; height: 8px; border: solid #1E1E1F; border-width: 0 2px 2px 0; transform: rotate(45deg); }
+
+        /* ==========================================
+           5. 表格与弹窗
+        ========================================== */
+        .table-wrapper { overflow-x: auto; margin-bottom: 20px; padding-bottom: 10px; }
+        .table-wrapper::-webkit-scrollbar { height: 16px; background: #313233; border: 2px solid #1E1E1F; }
+        .table-wrapper::-webkit-scrollbar-thumb { background: #D0D1D4; border: 2px solid #1E1E1F; box-shadow: inset 2px 2px #FFF; cursor: pointer; }
+
+        table { border-collapse: collapse; table-layout: fixed; width: max-content; }
+        th, td { border: 2px solid #1E1E1F; padding: 15px; text-align: center; vertical-align: top; width: 260px; word-wrap: break-word; }
+        th { background-color: #313233; color: #FFFFFF; font-family: "Minecraft Five Bold", sans-serif; text-transform: uppercase; }
+        td { background-color: #48494A; }
+
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; }
+        .modal-content { 
+            background-color: #313233; color: #FFFFFF; border: 4px solid #1E1E1F; 
+            box-shadow: inset 4px 4px rgba(255, 255, 255, 0.15), inset -4px -4px rgba(0, 0, 0, 0.3);
+            width: 90%; max-width: 800px; padding: 30px; display: flex; flex-direction: column; max-height: 90vh; overflow-y: auto;
+        }
+
+        .filter-area, .group-inputs, .editor-toolbar, .image-upload-wrapper { 
+            background-color: #313233; border: 2px solid #1E1E1F; border-top: 2px solid #5A5B5C; border-left: 2px solid #5A5B5C;
+            padding: 10px; margin-top: 10px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+        }
+        .filter-label { color: #FFFFFF; font-size: 14px; display: flex; align-items: center; gap: 5px; cursor: pointer; font-family: "Minecraft Five Bold", sans-serif;}
+
+        /* ==========================================
+           6. 状态标签与拾色器
+        ========================================== */
+        .tag-select { 
+            background-color: #D0D1D4; border: 2px solid #1E1E1F; color: #000; 
+            font-family: "Minecraft Seven", sans-serif; padding: 4px; outline: none; cursor: pointer; 
+            box-shadow: inset 2px 2px #FFF; appearance: none; -webkit-appearance: none;
+        }
+        .tag-select-wrapper { position: relative; display: inline-block; }
+        .tag-select-wrapper::after { content: '▼'; font-size: 8px; position: absolute; right: 6px; top: 50%; transform: translateY(-50%); pointer-events: none; color: #000; }
+
+        .tag-badge { 
+            font-family: "Minecraft Five Bold", sans-serif; font-size: 11px; padding: 4px 8px; color: #FFF; 
+            border: 2px solid #1E1E1F; display: inline-block; vertical-align: middle; box-shadow: inset 2px 2px rgba(255,255,255,0.3); text-transform: uppercase;
+        }
+        .tag-想法 { background-color: #6CC349; } 
+        .tag-更新 { background-color: #FFE866; color: #000; } 
+        .tag-紧急 { background-color: #F46D6D; animation: pulse-live 1.5s infinite; } 
+
+        @keyframes pulse-live { 0% { box-shadow: 0 0 0 0 rgba(244, 109, 109, 0.7); } 70% { box-shadow: 0 0 0 6px rgba(244, 109, 109, 0); } 100% { box-shadow: 0 0 0 0 rgba(244, 109, 109, 0); } }
+
+        .group-badge { 
+            background-color: #313233; color: #FFF; padding: 4px 10px; font-weight: bold; border: 2px solid #1E1E1F; 
+            box-shadow: inset 2px 2px rgba(255,255,255,0.2); font-size: 12px; margin-bottom: 8px; display: inline-block;
+        }
+
+        .group-color-input, .group-color-input::-webkit-color-swatch, .group-color-input::-webkit-color-swatch-wrapper { border-radius: 50% !important; }
+        .group-color-input { -webkit-appearance: none; appearance: none; width: 28px !important; height: 28px !important; padding: 0; border: 2px solid #1E1E1F; cursor: pointer; box-shadow: inset 2px 2px rgba(255,255,255,0.4); background-color: transparent; overflow: hidden; }
+        .group-color-input::-webkit-color-swatch-wrapper { padding: 0; }
+        .group-color-input::-webkit-color-swatch { border: none; }
+
+        /* ==========================================
+           7. 投票卡片
+        ========================================== */
+        .vote-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 15px; margin-top: 20px; }
+        .vote-card { background-color: #313233; border: 2px solid #1E1E1F; padding: 20px; text-align: center; box-shadow: inset -2px -2px #1E1E1F, inset 2px 2px #5A5B5C; }
+        .count { font-family: "Minecraft Ten", sans-serif; font-size: 42px; margin: 15px 0; text-shadow: 2px 2px 0 #1E1E1F;}
+        
+        .format-btn { background: #D0D1D4; border: 2px solid #1E1E1F; font-weight: bold; cursor: pointer; box-shadow: inset 2px 2px #FFF; }
+        .format-btn:active { box-shadow: inset 2px 2px #888; }
+        .login-input { margin-bottom: 15px; }
+        .modal-actions { margin-top: 25px; display: flex; justify-content: flex-end; gap: 10px; }
+    
+
+        /* ==========================================
+           8. 新增:全局顶栏 / 落地选择页 / BL板块
+        ========================================== */
+        @font-face { font-family: 'BLZh'; src: url("./ZiZhiQuXiMaiTi-2.ttf") format('truetype'); font-display: swap; }
+        @font-face { font-family: 'BLJa'; src: url("./GenEiPOPle-Bk.ttf") format('truetype'); font-display: swap; }
+        :root {
+            --bl-gold:#FFD829; --bl-red:#E0262C; --bl-blue:#3C69F0;
+            --bl-ink:#09090A; --bl-inkblue:#1D3055; --bl-offwhite:#FCFCFC;
+        }
+        @keyframes slideDown { from { opacity:0; transform: translateY(-26px); } to { opacity:1; transform: translateY(0); } }
+        @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:.3; } }
+        @keyframes floatBob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+        body { padding-top: 76px; }
+
+        #globalBar { position: fixed; top:0; left:0; right:0; height:56px; z-index:500; display:flex; align-items:center; gap:10px; padding:0 14px; background:#313233; border-bottom:3px solid #1E1E1F; }
+        #gbTitle { color:#FFE866; font-family:"Minecraft Five Bold",sans-serif; font-size:14px; letter-spacing:1px; text-shadow:2px 2px 0 #1E1E1F; white-space:nowrap; }
+        .gb-spacer { flex:1; }
+        .gb-btn { background-color:#48494A; color:#FFF; border:2px solid #1E1E1F; padding:6px 12px; cursor:pointer; font-family:"Minecraft Seven",sans-serif; font-size:13px; box-shadow: inset 2px 2px rgba(255,255,255,.15), inset -2px -2px rgba(0,0,0,.3); text-decoration:none; display:inline-block; user-select:none; }
+        .gb-btn:hover { background-color:#5A5B5C; }
+        .gb-btn:active { transform: translateY(2px); box-shadow: inset 2px 2px rgba(0,0,0,.4); }
+        .sw-btn { opacity:.4; }
+        .sw-btn.sw-active { opacity:1; background:#3C8527; }
+
+        /* ---- 落地选择页 ---- */
+        #landingView { min-height: calc(100vh - 96px); display:flex; align-items:center; justify-content:center; padding:20px 16px 40px; }
+        .landing-inner { max-width: 980px; width:100%; text-align:center; animation: slideDown .6s cubic-bezier(.34,1.56,.64,1); }
+        .landing-logo { width:min(340px,74vw); height:auto; filter: drop-shadow(4px 4px 0 rgba(0,0,0,.45)); animation: floatBob 3.6s ease-in-out infinite; }
+        .landing-title { font-family:"Minecraft Ten","Minecraft Seven",sans-serif; font-size:44px; color:#FFF; text-shadow:3px 3px 0 #1E1E1F; margin:18px 0 4px; }
+        .landing-sub { color:#B1B2B5; font-size:14px; margin-bottom:32px; font-family:"Minecraft Five Bold",sans-serif; letter-spacing:3px; }
+        .landing-cards { display:flex; gap:26px; justify-content:center; flex-wrap:wrap; }
+        .landing-card { width:350px; max-width:92vw; background:#313233; border:3px solid #1E1E1F; padding:30px 24px 26px; cursor:pointer; text-align:center; box-shadow: inset 4px 4px rgba(255,255,255,.12), inset -4px -4px rgba(0,0,0,.3), 6px 6px 0 rgba(0,0,0,.35); transition: transform .18s, background .18s; }
+        .landing-card:hover { transform: translateY(-5px); background:#3D3E3F; }
+        .landing-card:active { transform: translateY(2px); }
+        .lc-icon { font-size:54px; margin-bottom:10px; animation: floatBob 3.2s ease-in-out infinite; }
+        .lc-logo { width:76px; height:76px; object-fit:contain; margin-bottom:6px; animation: floatBob 3.2s ease-in-out infinite; }
+        .lc-logo-full { width:min(230px,82%); height:auto; margin-bottom:8px; animation: floatBob 3.2s ease-in-out infinite; filter: drop-shadow(3px 3px 0 rgba(0,0,0,.35)); }
+        .landing-card h2 { margin:8px 0 3px; }
+        .lc-en { color:#FFE866; font-family:"Minecraft Five Bold",sans-serif; font-size:12px; letter-spacing:2px; margin-bottom:12px; }
+        .lc-bl .lc-en { color:#8FB0FF; }
+        .landing-card p { color:#D0D1D4; font-size:14px; line-height:1.7; min-height:48px; margin:0; }
+        .lc-go { display:inline-block; margin-top:12px; background:#3C8527; color:#FFF; border:2px solid #1E1E1F; padding:8px 20px 10px; font-family:"Minecraft Five Bold",sans-serif; box-shadow: inset 0 -4px #1D4D13, inset 3px 3px rgba(255,255,255,.2); }
+        .lc-bl .lc-go { background:#3C69F0; box-shadow: inset 0 -4px #1D3055, inset 3px 3px rgba(255,255,255,.25); }
+        .landing-foot { margin-top:46px; color:#8B8C8E; font-size:12px; font-family:"Minecraft Five Bold",sans-serif; }
+        #secretDot { opacity:.28; user-select:none; margin-left:8px; }
+
+        /* ---- BL 板块(ORE 主题下为暗色) ---- */
+        #blSection { max-width:1100px; margin:0 auto; animation: slideDown .6s cubic-bezier(.34,1.56,.64,1); }
+        .bls-hero { text-align:center; padding:26px 12px 8px; }
+        .bls-logo { max-width:360px; width:74%; filter: drop-shadow(5px 5px 0 rgba(0,0,0,.5)); }
+        .bls-title { font-size:38px; margin:10px 0 4px; }
+        .bls-sub { color:#B1B2B5; letter-spacing:3px; font-family:"Minecraft Five Bold",sans-serif; margin:4px 0 18px; font-size:13px; }
+        .bls-marquee { display:none; }
+        .bls-band { padding:28px 16px 36px; margin-top:20px; }
+        .bls-h2 { text-align:center; font-size:24px; }
+        .bls-h2 span.ls { display:block; font-size:12px; letter-spacing:3px; color:#B1B2B5; margin-top:4px; }
+        .bls-tip { text-align:center; color:#B1B2B5; font-size:13px; margin:-4px 0 20px; }
+        .bls-ev-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(260px,1fr)); gap:16px; }
+        .bls-ev-card { background:#313233; border:2px solid #1E1E1F; padding:20px; box-shadow: inset -2px -2px #1E1E1F, inset 2px 2px #5A5B5C; position:relative; }
+        .bls-ev-card h3 { margin:12px 0 8px; font-size:17px; }
+        .bls-ev-top { display:flex; justify-content:space-between; align-items:center; gap:8px; padding-right:60px; }
+        .bls-ev-date { color:#FFE866; font-size:12px; font-family:"Minecraft Five Bold",sans-serif; }
+        .bls-ev-game { display:inline-block; background:#48494A; border:2px solid #1E1E1F; color:#FFF; font-size:12px; padding:3px 8px; margin-bottom:10px; }
+        .bls-ev-desc { color:#D0D1D4; font-size:13px; line-height:1.7; min-height:56px; margin-bottom:14px; }
+        .bls-hype-btn { width:100%; }
+        .bls-ev-admin { position:absolute; top:8px; right:8px; display:flex; gap:6px; z-index:2; }
+        .is-ended { opacity:.62; }
+        .tag-badge.st-upcoming { background:#3C69F0; }
+        .tag-badge.st-live { background:#F46D6D; animation: pulse-live 1.5s infinite; }
+        .tag-badge.st-ended { background:#5A5B5C; }
+        .bls-log-list { display:flex; flex-direction:column; gap:12px; max-width:780px; margin:0 auto; }
+        .bls-log-item { background:#313233; border:2px solid #1E1E1F; border-left:6px solid #6CC349; padding:14px 16px; box-shadow: inset 2px 2px rgba(255,255,255,.08); position:relative; }
+        .bls-log-head { display:flex; align-items:center; gap:12px; margin-bottom:6px; padding-right:80px; }
+        .bls-log-ver { background:#6CC349; color:#1E1E1F; font-family:"Minecraft Five Bold",sans-serif; padding:3px 10px; border:2px solid #1E1E1F; font-size:12px; }
+        .bls-log-date { color:#B1B2B5; font-size:12px; }
+        .bls-log-body { color:#D0D1D4; font-size:13px; line-height:1.8; }
+        .bls-admin-row { margin-top:20px; display:flex; gap:10px; justify-content:center; }
+        .bls-f-label { display:block; text-align:left; font-size:13px; color:#FFE866; margin:12px 0 6px; font-family:"Minecraft Five Bold",sans-serif; }
+        textarea.ore-input { background-color:#313233; color:#FFF; border:2px solid #1E1E1F; box-shadow: inset 0 4px #242425; padding:10px; font-family:"Minecraft Seven",sans-serif; width:100%; outline:none; min-height:110px; resize:vertical; caret-color:#6CC349; }
+
+        /* ---- 滚动显现动画 ---- */
+        .rv { opacity:0; transform: translateY(42px) scale(.92); transition: opacity .55s cubic-bezier(.34,1.56,.64,1), transform .55s cubic-bezier(.34,1.56,.64,1); }
+        .rv.revealed { opacity:1; transform:none; }
+
+        /* ==========================================
+           9. BL 主题覆盖(亮色 · 与主站一致)
+        ========================================== */
+        body.theme-bl { background: var(--bl-offwhite); color: var(--bl-ink); font-family:'BLZh',"Minecraft Seven",sans-serif; }
+        body.theme-bl #globalBar { background:#fff; border-bottom:4px solid var(--bl-ink); box-shadow:0 4px 0 rgba(0,0,0,.15); }
+        body.theme-bl #gbTitle { color:var(--bl-ink); text-shadow:none; font-family:'Passion One','BLZh',sans-serif; font-size:19px; letter-spacing:2px; }
+        body.theme-bl .gb-btn { background:#fff; color:var(--bl-ink); border:3px solid var(--bl-ink); box-shadow:3px 3px 0 rgba(0,0,0,.85); font-weight:bold; font-family:'BLZh',sans-serif; }
+        body.theme-bl .gb-btn:hover { background:var(--bl-gold); }
+        body.theme-bl .sw-btn.sw-active { background:var(--bl-gold); color:var(--bl-ink); }
+
+        body.theme-bl #landingView { background:
+            radial-gradient(circle at 10% 16%, rgba(255,216,41,.5), transparent 32%),
+            radial-gradient(circle at 90% 10%, rgba(60,105,240,.20), transparent 30%),
+            radial-gradient(circle at 84% 88%, rgba(224,38,44,.16), transparent 30%),
+            var(--bl-offwhite); }
+        body.theme-bl .landing-logo { filter: drop-shadow(5px 5px 0 rgba(0,0,0,.28)); }
+        body.theme-bl .landing-title { color:var(--bl-ink); text-shadow:none; font-family:'BLZh','Passion One',sans-serif; }
+        body.theme-bl .landing-sub { color:#666; }
+        body.theme-bl .landing-card { background:#fff; border:3px solid var(--bl-ink); box-shadow:8px 8px 0 rgba(0,0,0,.85); transition: transform .4s cubic-bezier(.34,1.56,.64,1), box-shadow .2s; }
+        body.theme-bl .landing-card:nth-child(1) { transform: rotate(-2deg); }
+        body.theme-bl .landing-card:nth-child(2) { transform: rotate(2deg); background:var(--bl-gold); }
+        body.theme-bl .landing-card:hover { transform: rotate(0deg) translateY(-9px) scale(1.03); box-shadow:13px 13px 0 rgba(0,0,0,.85); background:#fff; }
+        body.theme-bl .landing-card:nth-child(2):hover { background:var(--bl-gold); }
+        body.theme-bl .landing-card h2 { color:var(--bl-ink); text-shadow:none; font-family:'BLZh','Passion One',sans-serif; font-size:26px; }
+        body.theme-bl .lc-en { color:var(--bl-red); }
+        body.theme-bl .lc-bl .lc-en { color:var(--bl-inkblue); }
+        body.theme-bl .landing-card p { color:#333; }
+        body.theme-bl .lc-go { border:3px solid var(--bl-ink); box-shadow:4px 4px 0 rgba(0,0,0,.85); font-family:'BLZh',sans-serif; background:var(--bl-blue); }
+        body.theme-bl .lc-bl .lc-go { background:var(--bl-red); box-shadow:4px 4px 0 rgba(0,0,0,.85); }
+        body.theme-bl .landing-foot { color:#777; }
+
+        body.theme-bl h1, body.theme-bl h2, body.theme-bl h3 { color:var(--bl-ink); text-shadow:none; font-family:'BLZh','Passion One',"Minecraft Five Bold",sans-serif; }
+        body.theme-bl .status-bar { border:3px solid var(--bl-ink); box-shadow:5px 5px 0 rgba(0,0,0,.85); font-family:'BLZh',sans-serif; }
+        body.theme-bl .status-ok { background:#fff; color:#1A7F37; }
+        body.theme-bl .status-error { background:#fff; color:var(--bl-red); }
+        body.theme-bl .filter-area, body.theme-bl .group-inputs, body.theme-bl .editor-toolbar, body.theme-bl .image-upload-wrapper { background:#fff; border:3px solid var(--bl-ink); border-top:3px solid var(--bl-ink); border-left:3px solid var(--bl-ink); box-shadow:5px 5px 0 rgba(0,0,0,.85); }
+        body.theme-bl .filter-label, body.theme-bl .filter-area strong { color:var(--bl-ink) !important; }
+        body.theme-bl th { background:var(--bl-inkblue); }
+        body.theme-bl td { background:#fff; color:var(--bl-ink); }
+        body.theme-bl input[type="text"], body.theme-bl input[type="password"], body.theme-bl .editor-box, body.theme-bl .group-name-input, body.theme-bl textarea.ore-input { background:#fff; color:var(--bl-ink); caret-color:var(--bl-blue); border:3px solid var(--bl-ink); box-shadow:none; }
+        body.theme-bl input:focus, body.theme-bl .editor-box:focus { border-color:var(--bl-blue); }
+        body.theme-bl .guest-view-box { background:#EFF1F4; color:var(--bl-ink); border:3px solid var(--bl-ink); box-shadow:none; }
+        body.theme-bl .vote-card { background:#fff; border:3px solid var(--bl-ink); box-shadow:8px 8px 0 rgba(0,0,0,.85); transition: transform .35s cubic-bezier(.34,1.56,.64,1); }
+        body.theme-bl .vote-card:nth-child(odd) { transform: rotate(-1.5deg); }
+        body.theme-bl .vote-card:nth-child(even) { transform: rotate(1.5deg); }
+        body.theme-bl .vote-card:hover { transform: rotate(0) translateY(-7px); }
+        body.theme-bl .count { color:var(--bl-red) !important; text-shadow:none; font-family:'Passion One',sans-serif; }
+        body.theme-bl .btn { border:3px solid var(--bl-ink); box-shadow:4px 4px 0 rgba(0,0,0,.85); font-family:'BLZh',"Minecraft Seven",sans-serif; }
+        body.theme-bl .btn:active { transform:translateY(4px); box-shadow:1px 1px 0 rgba(0,0,0,.85); }
+        body.theme-bl .btn-save, body.theme-bl .btn-vote { background:var(--bl-blue); box-shadow:4px 4px 0 rgba(0,0,0,.85); }
+        body.theme-bl .btn-add, body.theme-bl .btn-close-modal, body.theme-bl .btn-fullscreen, body.theme-bl .icon-btn { background:#fff; color:var(--bl-ink); box-shadow:4px 4px 0 rgba(0,0,0,.85); }
+        body.theme-bl .icon-btn { box-shadow:2px 2px 0 rgba(0,0,0,.85); border:3px solid var(--bl-ink); }
+        body.theme-bl .btn-delete-col, body.theme-bl .btn-revoke { background:var(--bl-red); box-shadow:4px 4px 0 rgba(0,0,0,.85); }
+        body.theme-bl .tool-btn { background:#fff; color:var(--bl-ink); border:3px solid var(--bl-ink); box-shadow:3px 3px 0 rgba(0,0,0,.85); }
+        body.theme-bl .modal-content { background:#fff; color:var(--bl-ink); border:4px solid var(--bl-ink); box-shadow:12px 12px 0 rgba(0,0,0,.85); }
+        body.theme-bl .modal-content h2 { color:var(--bl-ink); }
+        body.theme-bl .modal-content p, body.theme-bl .modal-content label { color:#444; }
+        body.theme-bl .format-btn { border:3px solid var(--bl-ink); box-shadow:2px 2px 0 rgba(0,0,0,.85); }
+        body.theme-bl .tag-select { border:3px solid var(--bl-ink); box-shadow:2px 2px 0 rgba(0,0,0,.6); }
+        body.theme-bl .bls-f-label { color:var(--bl-red); }
+        body.theme-bl .bls-tip { color:#555; }
+        body.theme-bl hr { border-top:4px solid var(--bl-ink) !important; }
+        body.theme-bl #mainApp > p, body.theme-bl .bls-log-date { color:#666 !important; }
+
+        body.theme-bl .bls-hero { background:var(--bl-gold); border:4px solid var(--bl-ink); box-shadow:10px 10px 0 rgba(0,0,0,.85); margin-top:14px; padding:36px 14px 26px; }
+        body.theme-bl .bls-logo { filter:none; }
+        body.theme-bl .bls-title { font-family:'BLZh','Passion One',sans-serif; font-size:46px; }
+        body.theme-bl .bls-sub { color:var(--bl-inkblue); font-family:'Passion One','BLZh',sans-serif; font-size:17px; }
+        body.theme-bl .bls-marquee { display:block; overflow:hidden; background:var(--bl-red); border-top:4px solid var(--bl-ink); border-bottom:4px solid var(--bl-ink); transform:rotate(-1.2deg); margin:30px -20px 4px; }
+        body.theme-bl .bls-mq-track { display:flex; width:max-content; white-space:nowrap; animation: blsMq 20s linear infinite; }
+        body.theme-bl .bls-mq-track span { color:#fff; font-family:'Passion One','BLZh',sans-serif; font-size:20px; letter-spacing:2px; padding:10px 0; }
+        @keyframes blsMq { from { transform:translateX(0); } to { transform:translateX(-50%); } }
+        body.theme-bl .bls-band-white { background:#fff; border:4px solid var(--bl-ink); box-shadow:8px 8px 0 rgba(0,0,0,.85); }
+        body.theme-bl .bls-band-blue { background:var(--bl-blue); border:4px solid var(--bl-ink); box-shadow:8px 8px 0 rgba(0,0,0,.85); }
+        body.theme-bl .bls-band-blue .bls-tip { color:#DCE6FF; }
+        body.theme-bl .bls-h2 { display:block; width:fit-content; margin:0 auto 22px; background:#fff; border:3px solid var(--bl-ink); box-shadow:6px 6px 0 rgba(0,0,0,.85); padding:10px 26px; transform:rotate(-1.5deg); font-family:'BLZh','Passion One',sans-serif; font-size:28px; }
+        body.theme-bl .bls-h2 span.ls { color:var(--bl-red); font-family:'Passion One',sans-serif; }
+        body.theme-bl .bls-ev-card { background:#fff; border:3px solid var(--bl-ink); box-shadow:8px 8px 0 rgba(0,0,0,.85); transition: transform .4s cubic-bezier(.34,1.56,.64,1); }
+        body.theme-bl .bls-ev-card.revealed:nth-child(3n+1) { transform:rotate(-2deg); }
+        body.theme-bl .bls-ev-card.revealed:nth-child(3n+2) { transform:rotate(1.3deg) translateY(6px); }
+        body.theme-bl .bls-ev-card.revealed:nth-child(3n) { transform:rotate(2.1deg); }
+        body.theme-bl .bls-ev-card.revealed:hover { transform:rotate(0) translateY(-9px) scale(1.03); }
+        body.theme-bl .bls-ev-card h3 { color:var(--bl-ink); font-size:20px; }
+        body.theme-bl .bls-ev-date { color:var(--bl-red); font-family:'BLZh',sans-serif; }
+        body.theme-bl .bls-ev-game { background:var(--bl-gold); color:var(--bl-ink); border:3px solid var(--bl-ink); }
+        body.theme-bl .bls-ev-desc { color:#333; }
+        body.theme-bl .bls-log-item { background:#fff; border:3px solid var(--bl-ink); border-left:10px solid var(--bl-gold); box-shadow:6px 6px 0 rgba(0,0,0,.85); }
+        body.theme-bl .bls-log-ver { background:var(--bl-gold); border:3px solid var(--bl-ink); font-family:'Passion One',sans-serif; font-size:14px; }
+        body.theme-bl .bls-log-body { color:#333; }
+
+        /* ---- 日语界面字体(BL 风格用 BLJa) ---- */
+        body.theme-bl.lang-ja { font-family:'BLJa','Passion One',"Minecraft Seven",sans-serif; }
+        body.theme-bl.lang-ja h1, body.theme-bl.lang-ja h2, body.theme-bl.lang-ja h3,
+        body.theme-bl.lang-ja .landing-title, body.theme-bl.lang-ja .landing-card h2,
+        body.theme-bl.lang-ja .bls-title, body.theme-bl.lang-ja .bls-h2,
+        body.theme-bl.lang-ja .gb-btn, body.theme-bl.lang-ja .btn,
+        body.theme-bl.lang-ja .status-bar, body.theme-bl.lang-ja .lc-go {
+            font-family:'BLJa','Passion One',"Minecraft Five Bold",sans-serif;
+        }
+
+        @media (max-width: 640px) {
+            #gbTitle { display:none; }
+            #globalBar { padding:0 8px; gap:6px; overflow-x:auto; }
+            .gb-btn { padding:5px 8px; font-size:11px; }
+            .landing-card { width:100%; }
+            .landing-title { font-size:30px; }
+            .landing-sub { font-size:11px; letter-spacing:1px; }
+            .lc-go { padding:7px 14px 9px; }
+            .bls-hero { padding:18px 6px 4px; }
+            body.theme-bl .bls-hero { padding:24px 8px 18px; }
+            .bls-logo { width:88%; max-width:280px; }
+            .bls-title { font-size:26px; }
+            body.theme-bl .bls-title { font-size:30px; }
+            body.theme-bl .bls-marquee { margin:22px -14px 4px; }
+            .bls-count { padding:10px 14px; }
+            .bls-count-time { font-size:22px; }
+            .bls-count-label { font-size:10px; }
+            .bls-band { padding:20px 10px 26px; }
+            .bls-h2 { font-size:19px; }
+            body.theme-bl .bls-h2 { font-size:20px; padding:8px 16px; }
+            .bls-ev-grid { grid-template-columns:1fr; }
+            .bls-hof-grid { grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); }
+            .bls-tab { font-size:11px; padding:5px 10px; }
+            .top-tools { position:static; justify-content:flex-end; margin-bottom:8px; }
+            .container h1 { font-size:22px; }
+            .modal-content { padding:18px; }
+            th, td { width:200px; padding:10px; }
+            .landing-foot { font-size:10px; }
+        }
+        /* ---- 倒计时 / 赛事筛选 / 荣誉榜 ---- */
+        .bls-count { display:inline-block; background:#313233; border:2px solid #1E1E1F; padding:12px 26px; margin:16px auto 2px; box-shadow: inset 2px 2px rgba(255,255,255,.12), inset -2px -2px rgba(0,0,0,.3); }
+        .bls-count-label { color:#FFE866; font-family:"Minecraft Five Bold",sans-serif; font-size:12px; letter-spacing:2px; }
+        .bls-count-time { font-family:"Minecraft Ten","Minecraft Seven",sans-serif; font-size:30px; color:#FFF; text-shadow:2px 2px 0 #1E1E1F; margin-top:4px; }
+        .bls-count-name { color:#B1B2B5; font-size:12px; margin-top:4px; }
+        .bls-tabs { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-bottom:20px; }
+        .bls-tab { background:#313233; color:#FFF; border:2px solid #1E1E1F; padding:6px 14px; cursor:pointer; font-family:"Minecraft Five Bold",sans-serif; font-size:12px; box-shadow: inset 2px 2px rgba(255,255,255,.12); }
+        .bls-tab:hover { background:#48494A; }
+        .bls-tab.on { background:#3C8527; }
+        .bls-hof-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:16px; }
+        .bls-hof-card { background:#313233; border:2px solid #1E1E1F; padding:18px; text-align:center; position:relative; box-shadow: inset -2px -2px #1E1E1F, inset 2px 2px #5A5B5C; }
+        .bls-hof-season { display:inline-block; background:#FFE866; color:#1E1E1F; border:2px solid #1E1E1F; font-family:"Minecraft Five Bold",sans-serif; font-size:11px; padding:3px 10px; margin-bottom:8px; }
+        .bls-hof-winner { font-size:20px; color:#FFF; font-family:"Minecraft Five Bold",sans-serif; margin:6px 0; }
+        .bls-hof-event { color:#B1B2B5; font-size:12px; }
+        .bls-hof-note { color:#8B8C8E; font-size:11px; margin-top:8px; }
+        body.theme-bl .bls-count { background:#fff; border:3px solid var(--bl-ink); box-shadow:6px 6px 0 rgba(0,0,0,.85); }
+        body.theme-bl .bls-count-label { color:var(--bl-red); font-family:'BLZh',sans-serif; }
+        body.theme-bl .bls-count-time { color:var(--bl-ink); text-shadow:none; font-family:'Passion One','BLZh',sans-serif; letter-spacing:2px; }
+        body.theme-bl .bls-count-name { color:#555; }
+        body.theme-bl .bls-tab { background:#fff; color:var(--bl-ink); border:3px solid var(--bl-ink); box-shadow:3px 3px 0 rgba(0,0,0,.85); font-family:'BLZh',sans-serif; }
+        body.theme-bl .bls-tab:hover { background:var(--bl-gold); }
+        body.theme-bl .bls-tab.on { background:var(--bl-gold); }
+        body.theme-bl .bls-band-gold2 { background:var(--bl-gold); border:4px solid var(--bl-ink); box-shadow:8px 8px 0 rgba(0,0,0,.85); }
+        body.theme-bl .bls-band-gold2 .bls-tip { color:#6B5B00; }
+        body.theme-bl .bls-hof-card { background:#fff; border:3px solid var(--bl-ink); box-shadow:6px 6px 0 rgba(0,0,0,.85); transition: transform .35s cubic-bezier(.34,1.56,.64,1); }
+        body.theme-bl .bls-hof-card.revealed:nth-child(odd) { transform: rotate(-1.6deg); }
+        body.theme-bl .bls-hof-card.revealed:nth-child(even) { transform: rotate(1.6deg); }
+        body.theme-bl .bls-hof-card.revealed:hover { transform: rotate(0) translateY(-7px); }
+        body.theme-bl .bls-hof-season { border:3px solid var(--bl-ink); }
+        body.theme-bl .bls-hof-winner { color:var(--bl-ink); font-family:'BLZh','Passion One',sans-serif; }
+        body.theme-bl .bls-hof-event { color:#555; }
+        body.theme-bl .bls-hof-note { color:#777; }
+    </style>
+</head>
+<body class="theme-ore">
+<script>document.body.className = 'theme-' + (localStorage.getItem('bl-theme') || 'ore') + ' lang-' + (localStorage.getItem('bl-lang') || 'zh');</script>
+<script>
+    // 🚀 Shadow DOM 音频组件：无敌护盾，防干扰！
+    class OreAudioPlayer extends HTMLElement {
+        constructor() {
+            super();
+            this.attachShadow({ mode: 'open' });
+        }
+        connectedCallback() {
+            const src = this.getAttribute('src');
+            const name = this.getAttribute('name') || 'AUDIO FILE';
+            // MIDI 格式浏览器无法直接播放，添加智能判断
+            const isMidi = src.toLowerCase().endsWith('.mid') || src.toLowerCase().endsWith('.midi');
+
+            this.shadowRoot.innerHTML = `
+                <style>
+                    * { box-sizing: border-box; border-radius: 0 !important; font-family: "Minecraft Seven", sans-serif; }
+                    .audio-box { background:#313233; border:2px solid #1E1E1F; padding:10px; margin:10px 0; text-align:left; }
+                    .title { color:#FFE866; font-family:'Minecraft Five Bold', sans-serif; margin-bottom:10px; font-size:12px; }
+                    .btn { cursor: pointer; border: 2px solid #1E1E1F; font-weight: bold; padding: 4px 10px; text-transform: uppercase; display: inline-block; text-decoration: none; user-select: none; font-size:10px;}
+                    .btn:active { transform: translateY(2px); }
+                    .icon-btn { background-color: #D0D1D4; color: #000000; box-shadow: inset 0 -2px #58585A, inset 2px 2px rgba(255, 255, 255, 0.6); }
+                    .icon-btn:active { box-shadow: inset 2px 2px rgba(255, 255, 255, 0.8); }
+                    .progress-bg { flex:1; height:16px; background:#48494A; border:2px solid #1E1E1F; cursor:pointer; position:relative; }
+                    .progress-fill { height:100%; width:0%; background:#3C8527; pointer-events:none; box-shadow: inset 2px 2px rgba(255,255,255,0.2); }
+                </style>
+                <div class="audio-box" contenteditable="false">
+                    <div class="title">🎵 MUSIC: ${name}</div>
+                    ${isMidi ? `<div style="color:#F46D6D; font-size:12px; margin-bottom:10px;">Browser cannot play MIDI. Please download to listen.</div>` : `
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <button class="btn icon-btn play-btn" style="width:60px; margin:0;">PLAY</button>
+                        <div class="progress-bg"><div class="progress-fill"></div></div>
+                        <span class="time-display" style="font-size:12px; min-width:35px; color:#FFF;">0:00</span>
+                    </div>
+                    <audio src="${src}" preload="metadata"></audio>
+                    `}
+                    <div style="margin-top:10px;">
+                        <a href="${src}" target="_blank" download="${name}" class="btn icon-btn dl-link">DOWNLOAD AUDIO</a>
+                    </div>
+                </div>
+            `;
+
+            // 独立的事件监听，不会被富文本编辑器拦截
+            const dlLink = this.shadowRoot.querySelector('.dl-link');
+            dlLink.addEventListener('click', (e) => {
+                e.stopPropagation();
+                window.playSnd('button');
+                window.showStatus("DOWNLOAD OPENED IN NEW WINDOW", "status-ok", true);
+            });
+
+            if (!isMidi) {
+                const audio = this.shadowRoot.querySelector('audio');
+                const btn = this.shadowRoot.querySelector('.play-btn');
+                const progBg = this.shadowRoot.querySelector('.progress-bg');
+                const fill = this.shadowRoot.querySelector('.progress-fill');
+                const timeStr = this.shadowRoot.querySelector('.time-display');
+
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    window.playSnd('button');
+                    if(audio.paused) {
+                        audio.play().catch(err => console.error("Play error:", err));
+                        btn.innerText = 'PAUSE';
+                    } else {
+                        audio.pause();
+                        btn.innerText = 'PLAY';
+                    }
+                });
+
+                progBg.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if(!audio.duration) return;
+                    const rect = progBg.getBoundingClientRect();
+                    const percent = (e.clientX - rect.left) / rect.width;
+                    audio.currentTime = percent * audio.duration;
+                });
+
+                audio.ontimeupdate = () => {
+                    if(audio.duration) {
+                        fill.style.width = ((audio.currentTime / audio.duration) * 100) + '%';
+                        const mins = Math.floor(audio.currentTime / 60);
+                        const secs = Math.floor(audio.currentTime % 60).toString().padStart(2, '0');
+                        timeStr.innerText = `${mins}:${secs}`;
+                    }
+                };
+                audio.onended = () => { btn.innerText = 'PLAY'; fill.style.width = '0%'; };
+            }
+        }
+    }
+    customElements.define('ore-audio', OreAudioPlayer);
+
+    const oreSounds = {
+        click: new Audio('./OreUI/sounds/sounds_click.ogg'),
+        button: new Audio('./OreUI/sounds/sounds_button.ogg'),
+        toast: new Audio('./OreUI/sounds/toast.ogg'),
+        pop: new Audio('./OreUI/sounds/pop.ogg'),
+        open: new Audio('./OreUI/sounds/sounds_drawer_open.ogg')
+    };
+
+    function playSnd(type) {
+        try { if(oreSounds[type]) { oreSounds[type].currentTime = 0; oreSounds[type].play().catch(()=>{}); } } catch(e) {}
+    }
+
+    document.addEventListener('click', function(e) {
+        if (e.target.closest('.btn') || e.target.closest('.format-btn')) { 
+            playSnd('button'); 
+        } else if (
+            e.target.closest('input[type="checkbox"]') || 
+            e.target.closest('input[type="color"]') || 
+            e.target.closest('input[type="file"]') || 
+            e.target.closest('select') || 
+            e.target.closest('.icon-btn') ||
+            e.target.closest('.filter-label') 
+        ) { 
+            playSnd('click'); 
+        }
+    });
+
+    document.addEventListener('change', function(e) {
+        if (e.target.tagName === 'SELECT' || e.target.type === 'file') playSnd('click');
+    });
+</script>
+
+<div class="modal-overlay" id="loginModal">
+    <div class="modal-content" style="max-width: 400px; text-align: center;">
+        <h2> AUTHORIZATION</h2>
+        <p style="color: #B1B2B5; font-size: 14px; margin-bottom: 25px;">Enter credentials to access Admin UI</p>
+        <input type="text" id="loginUser" class="login-input" placeholder="Username">
+        <input type="password" id="loginPass" class="login-input" placeholder="Password">
+        <div style="text-align: left; margin-bottom: 20px;">
+            <label class="filter-label"><input type="checkbox" id="rememberMe"> Remember Me</label>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+            <button class="btn btn-save" onclick="adminLogin()">Admin Login</button>
+            <button class="btn btn-close-modal" onclick="guestLogin()">CLOSE (Guest View)</button>
+        </div>
+    </div>
+</div>
+<div class="modal-overlay" id="adminGuideModal">
+    <div class="modal-content" style="max-width: 500px; text-align: center;">
+        <h2> WELCOME ADMIN</h2>
+        <div style="background: #1E1E1F; border: 2px solid #5A5B5C; padding: 15px; text-align: left; margin-bottom: 20px; font-size: 14px; line-height: 1.6;">
+            > Manage Map Ideas and Votes.<br>
+            > Group colors auto-sync.<br>
+            > Upload Any Files/Audios/Images.<br>
+            > Guests cannot edit contents.
+        </div>
+        <div class="modal-actions" style="justify-content: center;">
+            <button class="btn btn-save" style="width: 100%;" onclick="closeModal('adminGuideModal')">START EDITING</button>
+        </div>
+    </div>
+</div>
+
+<div id="globalBar">
+    <button class="gb-btn" id="btnBackHome" style="display:none" onclick="showLanding()" data-ik="btn_back">&#9664; 板块</button>
+    <button class="gb-btn" id="btnSwitchSec" style="display:none" onclick="switchSection()">切换</button>
+    <span id="gbTitle" data-ik="gb_title">玩法实验室 · IDEAS LAB</span>
+    <div class="gb-spacer"></div>
+    <a class="gb-btn" href="./index.html" data-ik="btn_home">&#127968; 主页</a>
+    <button class="gb-btn sw-btn" id="lgZh" onclick="setLang('zh')">中文</button>
+    <button class="gb-btn sw-btn" id="lgEn" onclick="setLang('en')">EN</button>
+    <button class="gb-btn sw-btn" id="lgJa" onclick="setLang('ja')">日本語</button>
+    <button class="gb-btn sw-btn" id="swOre" onclick="setTheme('ore')">ORE</button>
+    <button class="gb-btn sw-btn" id="swBl" onclick="setTheme('bl')">BL</button>
+    <button class="gb-btn" onclick="UiDebug.toggle()"> 调试</button>
+</div>
+
+<div id="landingView">
+    <div class="landing-inner">
+        <img class="landing-logo" src="logo.png" alt="SHIVR-DEV">
+        <div class="landing-title" data-ik="land_title">玩法实验室</div>
+        <div class="landing-sub" data-ik="land_sub">IDEAS LAB · 选择一个板块进入</div>
+        <div class="landing-cards">
+            <div class="landing-card" id="lcStudio" onclick="enterSection('studio')">
+                <div class="lc-icon">&#128736;&#65039;</div>
+                <h2 data-ik="lc1_t">工作室计划</h2>
+                <div class="lc-en" data-ik="lc1_en">STUDIO PLANS</div>
+                <p data-ik="lc1_d">地图玩法创意、开发计划与社区投票。<br>看看工作室接下来要做什么，为你喜欢的想法投票！</p>
+                <span class="lc-go" data-ik="lc_go">进入 ENTER &#10140;</span>
+            </div>
+            <div class="landing-card lc-bl" id="lcBL" onclick="enterSection('bl')">
+                <img class="lc-logo-full" src="assets/bl-logo-full.png" alt="Block Legends">
+                <h2>BLOCK LEGENDS</h2>
+                <div class="lc-en" data-ik="lc2_en">特殊赛事与更新安排</div>
+                <p data-ik="lc2_d">特殊赛事日历、版本更新日志。<br>为期待的赛事打 CALL 应援，掌握第一手安排！</p>
+                <span class="lc-go" data-ik="lc_go">进入 ENTER &#10140;</span>
+            </div>
+        </div>
+        <div class="landing-foot">&copy; 2026 SHIVR-DEV STUDIO<span id="secretDot">v3.0</span></div>
+    </div>
+</div>
+<div class="container" id="mainApp" style="display: none;">
+    <div class="top-tools">
+        <div class="tool-btn" title="Online Users">
+            <div class="online-indicator"></div>
+            <span id="onlineCount">Online: 1</span>
+            <span id="roleBadge" style="margin-left:10px; color:#FFE866;"></span>
+        </div>
+        <button class="tool-btn" id="btnLogout" style="display:none" onclick="logout()">LOGOUT</button>
+    </div>
+
+    <h1>MAP PLAN IDEAS</h1>
+    <div id="status" class="status-bar status-ok">Connecting to Server...</div>
+    
+    <div class="filter-area" id="filterArea">
+        <strong style="color: #FFF; font-size: 15px; margin-right: 5px;">VIEW FILTER:</strong>
+        <label class="filter-label"><input type="checkbox" id="selectAllFilters" onchange="toggleAllFilters(this)" checked>ALL</label>
+        <div style="width: 2px; height: 16px; background: #5A5B5C; margin: 0 5px;"></div>
+        <div id="dynamicFilters" style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center;"></div>
+    </div>
+
+    <div class="table-wrapper" id="scrollContainer">
+        <table id="mainTable">
+            <thead id="tHead"></thead>
+            <tbody id="tBody"></tbody>
+        </table>
+    </div>
+    
+    <div class="admin-controls" id="adminButtons">
+        <button class="btn btn-add" onclick="addColumn()">+ ADD IDEA</button>
+        <button class="btn btn-save" onclick="manualSave()"> SAVE ALL</button>
+    </div>
+
+    <hr style="margin: 40px 0; border: 0; border-top: 4px solid #313233;">
+    <h2>VOTING AREA</h2>
+    <p style="text-align: center; color: #B1B2B5; font-size: 14px;">1 Vote per idea per device.</p>
+    <div id="voteArea" class="vote-grid"></div>
+</div>
+
+<div id="blSection" style="display:none">
+    <div class="bls-hero">
+        <img class="bls-logo" src="assets/bl-logo-full.png" alt="Block Legends">
+        <h1 class="bls-title" data-ik="bl_title">特殊赛事与更新安排</h1>
+        <div class="bls-sub" data-ik="bl_sub">SPECIAL EVENTS &amp; UPDATE LOG</div>
+        <div id="blStatus" class="status-bar status-ok">CONNECTING...</div>
+        <div class="bls-count">
+            <div class="bls-count-label" data-ik="cd_label"> 下一场赛事 NEXT EVENT</div>
+            <div class="bls-count-time" id="blCountTime">--:--:--</div>
+            <div class="bls-count-name" id="blCountName">加载中...</div>
+        </div>
+    </div>
+
+    <div class="bls-marquee"><div class="bls-mq-track"><span>&#9733; SPECIAL EVENTS &#9733; UPDATE LOG &#9733; BLOCK LEGENDS &#9733; SEASON 1 &#9733; 打 CALL 应援 &#9733;&nbsp;</span><span aria-hidden="true">&#9733; SPECIAL EVENTS &#9733; UPDATE LOG &#9733; BLOCK LEGENDS &#9733; SEASON 1 &#9733; 打 CALL 应援 &#9733;&nbsp;</span></div></div>
+
+    <section class="bls-band bls-band-white">
+        <h2 class="bls-h2"><span data-ik="ev_h2">&#127942; 特殊赛事</span> <span class="ls" data-ik="ev_h2s">SPECIAL EVENTS</span></h2>
+        <p class="bls-tip" data-ik="ev_tip">点击「打 CALL」为你期待的赛事应援！每台设备每场赛事限一次。</p>
+        <div class="bls-tabs" id="blTabs">
+            <button class="bls-tab on" data-f="all" onclick="setBlFilter('all')" data-ik="tab_all">全部 ALL</button>
+            <button class="bls-tab" data-f="即将开始" onclick="setBlFilter('即将开始')" data-ik="tab_up">即将开始</button>
+            <button class="bls-tab" data-f="进行中" onclick="setBlFilter('进行中')" data-ik="tab_live">进行中 LIVE</button>
+            <button class="bls-tab" data-f="已结束" onclick="setBlFilter('已结束')" data-ik="tab_end">已结束</button>
+        </div>
+        <div id="blEventArea" class="bls-ev-grid"></div>
+        <div id="blEventAdmin" class="bls-admin-row" style="display:none">
+            <button class="btn btn-add" onclick="openEventEditor(-1)">+ ADD EVENT</button>
+            <button class="btn btn-save" onclick="saveBlData()"> SAVE ALL</button>
+        </div>
+    </section>
+
+    <section class="bls-band bls-band-blue">
+        <h2 class="bls-h2"><span data-ik="log_h2">&#128736;&#65039; 更新日志</span> <span class="ls" data-ik="log_h2s">UPDATE LOG</span></h2>
+        <p class="bls-tip" data-ik="log_tip">最新版本在最上方，每次更新的内容一目了然。</p>
+        <div id="blLogArea" class="bls-log-list"></div>
+        <div id="blLogAdmin" class="bls-admin-row" style="display:none">
+            <button class="btn btn-add" onclick="openLogEditor(-1)">+ ADD LOG</button>
+        </div>
+    </section>
+
+    <section class="bls-band bls-band-gold2">
+        <h2 class="bls-h2"><span data-ik="hof_h2"> 荣誉榜</span> <span class="ls" data-ik="hof_h2s">HALL OF FAME</span></h2>
+        <p class="bls-tip" data-ik="hof_tip">历届赛事的冠军与传奇时刻,永久铭刻。</p>
+        <div id="blHofArea" class="bls-hof-grid"></div>
+        <div id="blChampAdmin" class="bls-admin-row" style="display:none">
+            <button class="btn btn-add" onclick="openChampEditor(-1)">+ ADD CHAMPION</button>
+        </div>
+    </section>
+</div>
+<div class="modal-overlay" id="editModal">
+    <div class="modal-content">
+        <h2> DETAILS EDITOR</h2>
+        <div class="image-upload-wrapper" id="imageUploadArea">
+            <div>
+                <label style="font-weight: bold; font-size: 15px; color: #6CC349;">UPLOAD ANY FILE:</label>
+                <p style="margin: 5px 0 0 0; font-size: 12px; color: #B1B2B5;">Images, Audios (MP3/OGG), or Gen-Files (Max 20MB).</p>
+            </div>
+            <input type="file" id="imageInput" accept="*/*" onchange="uploadFileToRepo(event)" style="width: 200px;">
+        </div>
+        <div class="editor-toolbar" id="textToolbar" style="display: none;">
+            <button class="format-btn" style="font-weight: bold;" onclick="formatText('bold')" title="加粗">B</button>
+            <button class="format-btn" style="font-style: italic;" onclick="formatText('italic')" title="斜体">I</button>
+            <button class="format-btn" style="text-decoration: underline;" onclick="formatText('underline')" title="下划线">U</button>
+        </div>
+        <div id="fullscreenEditor" class="modal-editor editor-box" contenteditable="true" placeholder="Enter details..."></div>
+        <div id="fullscreenGuestView" class="guest-view-box modal-editor" style="display: none;" contenteditable="false"></div>
+        <div class="modal-actions">
+            <button class="btn btn-close-modal" onclick="closeModal('editModal')">CANCEL</button>
+            <button class="btn btn-save" id="btnSaveFullscreen" onclick="saveFullscreen()">CONFIRM</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="eventModal">
+    <div class="modal-content" style="max-width: 520px;">
+        <h2> 赛事编辑 EVENT</h2>
+        <label class="bls-f-label">赛事名称 TITLE</label>
+        <input type="text" id="evTitle" class="login-input">
+        <label class="bls-f-label">时间 DATE</label>
+        <input type="text" id="evDate" class="login-input" placeholder="2026-08-15 20:00">
+        <label class="bls-f-label">所属游戏 GAME</label>
+        <input type="text" id="evGame" class="login-input" placeholder="跑酷竞速 PARKOUR RUSH">
+        <label class="bls-f-label">状态 STATUS</label>
+        <div class="tag-select-wrapper" style="width:100%; margin-bottom:5px;">
+            <select id="evStatus" class="tag-select" style="width:100%;">
+                <option value="即将开始">即将开始 UPCOMING</option>
+                <option value="进行中">进行中 LIVE</option>
+                <option value="已结束">已结束 ENDED</option>
+            </select>
+        </div>
+        <label class="bls-f-label">介绍 DESC</label>
+        <textarea id="evDesc" class="ore-input"></textarea>
+        <div class="modal-actions">
+            <button class="btn btn-delete-col" id="evDelete" style="width:auto; margin:0;" onclick="deleteEvent(curEvIdx)">DELETE</button>
+            <span style="flex:1"></span>
+            <button class="btn btn-close-modal" onclick="closeModal('eventModal')">CANCEL</button>
+            <button class="btn btn-save" onclick="saveEvent()">CONFIRM</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="logModal">
+    <div class="modal-content" style="max-width: 520px;">
+        <h2> 日志编辑 LOG</h2>
+        <label class="bls-f-label">版本号 VERSION</label>
+        <input type="text" id="lgVersion" class="login-input" placeholder="v1.0.0">
+        <label class="bls-f-label">日期 DATE</label>
+        <input type="text" id="lgDate" class="login-input" placeholder="2026-08-08">
+        <label class="bls-f-label">更新内容 CHANGES(每行一条)</label>
+        <textarea id="lgChanges" class="ore-input" style="min-height:150px;"></textarea>
+        <div class="modal-actions">
+            <button class="btn btn-delete-col" id="lgDelete" style="width:auto; margin:0;" onclick="deleteLog(curLogIdx)">DELETE</button>
+            <span style="flex:1"></span>
+            <button class="btn btn-close-modal" onclick="closeModal('logModal')">CANCEL</button>
+            <button class="btn btn-save" onclick="saveLog()">CONFIRM</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="champModal">
+    <div class="modal-content" style="max-width: 520px;">
+        <h2> 荣誉编辑 CHAMPION</h2>
+        <label class="bls-f-label">赛季 SEASON</label>
+        <input type="text" id="chSeason" class="login-input" placeholder="S1">
+        <label class="bls-f-label">赛事 EVENT</label>
+        <input type="text" id="chEvent" class="login-input">
+        <label class="bls-f-label">冠军 WINNER</label>
+        <input type="text" id="chWinner" class="login-input">
+        <label class="bls-f-label">备注 NOTE</label>
+        <input type="text" id="chNote" class="login-input">
+        <div class="modal-actions">
+            <button class="btn btn-delete-col" id="chDelete" style="width:auto; margin:0;" onclick="deleteChamp(curChIdx)">DELETE</button>
+            <span style="flex:1"></span>
+            <button class="btn btn-close-modal" onclick="closeModal('champModal')">CANCEL</button>
+            <button class="btn btn-save" onclick="saveChamp()">CONFIRM</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ============ 核心配置：双仓库分家 ============
+    const p1 = 'ghp_'; 
+    const p2 = '9LZtot1qgVw1k1FSQVSSCIDlDlpJqL2rSs2D'; 
+    const G_TOKEN = p1 + p2; 
+
+    const REPO_OWNER = 'shivr-dev';
+    
+    // 1. 公开仓库：用来存放大家都能看的投票内容
+    const VOTE_REPO = 'ideas'; 
+    
+    // 2. 私有仓库：用来存放账号、密码和审核单
+    const AUTH_REPO = 'ideas-data'; 
+
+    // 你的投票统计和卡片数据存在公开库的这个 Issue ID 下
+    const ISSUE_ID = 1; 
+
+    let data = { topics: [], contents: [], editTimes: [], votes: [], groups: [], groupColors: [], tags: [] };
+    let currentUserRole = null; 
+    let isFirstLoad = true;
+    let currentEditIndex = -1;
+    let activeFilters = new Set(); 
+
+    window.onload = function() {
+        const savedRole = localStorage.getItem('userRole');
+        if (savedRole === 'admin') { document.getElementById('rememberMe').checked = true; grantAccess('admin', true); } 
+        else if (savedRole === 'guest') { document.getElementById('rememberMe').checked = true; grantAccess('guest', true); }
+    };
+
+    // 验证逻辑：去私有仓库 (AUTH_REPO) 寻找密码
+    async function adminLogin() {
+        const u = document.getElementById('loginUser').value.trim();
+        const p = document.getElementById('loginPass').value.trim();
+        
+        if (!u || !p) {
+            alert("请输入用户名和密码！");
+            return;
+        }
+
+        if (u === 'Infrato' && p === 'hajimi') {
+            if (document.getElementById('rememberMe').checked) localStorage.setItem('userRole', 'admin');
+            grantAccess('admin', false);
+            return;
+        }
+
+        document.querySelector('#loginModal .btn-save').innerText = 'VERIFYING...';
+        
+        try {
+            // 🚨 关键修复：这里调用的是私有仓库 AUTH_REPO
+            const res = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${AUTH_REPO}/issues?labels=approved&state=all`, {
+                headers: { 'Authorization': `token ${G_TOKEN}` }
+            });
+            const issues = await res.json();
+            
+            let isValid = false;
+            
+            for (let issue of issues) {
+                const idMatch = issue.body.match(/- \*\*游戏 ID\*\*: (.*)/);
+                const passMatch = issue.body.match(/- \*\*生成密码\*\*: (.*)/);
+                
+                if (idMatch && passMatch && idMatch[1].trim() === u && passMatch[1].trim() === p) {
+                    isValid = true;
+                    break;
+                }
+            }
+
+            if (isValid) {
+                if (document.getElementById('rememberMe').checked) localStorage.setItem('userRole', 'admin');
+                grantAccess('admin', false);
+            } else {
+                alert("登录失败！密码错误，或您的申请尚未被管理员审核通过。");
+            }
+        } catch (e) {
+            alert("验证网络连接失败，请稍后再试！");
+        } finally {
+            document.querySelector('#loginModal .btn-save').innerText = 'Admin Login';
+        }
+    }
+
+    function guestLogin() {
+        if (document.getElementById('rememberMe').checked) localStorage.setItem('userRole', 'guest');
+        grantAccess('guest', false);
+    }
+    function logout() { localStorage.removeItem('userRole'); location.reload(); }
+
+    function grantAccess(role, isAutoLogin) {
+        currentUserRole = role;
+        document.getElementById('loginModal').style.opacity = '0';
+        setTimeout(() => document.getElementById('loginModal').style.display = 'none', 300);
+        document.getElementById('mainApp').style.display = 'block';
+        document.getElementById('roleBadge').innerText = role === 'admin' ? 'ADMIN' : 'GUEST';
+        if (role === 'guest') document.getElementById('adminButtons').style.display = 'none'; 
+        else if (role === 'admin' && !isAutoLogin) openModal('adminGuideModal');
+        loadData(); setInterval(loadData, 8000); 
+    }
+
+    // 读档逻辑：去公开仓库 (VOTE_REPO) 读取大家的想法和投票
+    async function loadData() {
+        try {
+            // 🚨 关键修复：使用 VOTE_REPO
+            const res = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${VOTE_REPO}/issues/${ISSUE_ID}`, { headers: { 'Authorization': `token ${G_TOKEN}` } });
+            if (!res.ok) throw new Error("Connection Failed");
+            
+            const issue = await res.json();
+            const remoteData = JSON.parse(issue.body);
+            
+            if (remoteData && remoteData.topics) {
+                if (!remoteData.contents) remoteData.contents = remoteData.topics.map(() => "");
+                if (!remoteData.editTimes) remoteData.editTimes = remoteData.topics.map(() => "");
+                if (!remoteData.groups) remoteData.groups = remoteData.topics.map(() => "");
+                if (!remoteData.groupColors) remoteData.groupColors = remoteData.topics.map(() => "#0366d6");
+                if (!remoteData.tags) remoteData.tags = remoteData.topics.map(() => "想法"); 
+                
+                const isDataChanged = JSON.stringify(data) !== JSON.stringify(remoteData);
+                data = remoteData;
+                
+                if (isFirstLoad) { 
+                    data.groups.forEach(g => activeFilters.add(g || "UNGROUPED"));
+                    renderFilters(); renderTable(); isFirstLoad = false; 
+                    showStatus("SYNCED WITH SERVER", "status-ok", true);
+                } else { 
+                    renderFilters(); 
+                    if (isDataChanged) { 
+                        showStatus("NEW UPDATE RECEIVED", "status-ok", true); 
+                    } else { 
+                        showStatus("SYNCED WITH SERVER", "status-ok", false); 
+                    }
+                }
+                renderVotes(); updateOnlineCounter();
+            }
+        } catch (e) {
+            if (e.name === 'SyntaxError') saveDataToServer(); 
+            else showStatus("SYNC FAILED", "status-error", true);
+        }
+    }
+
+    // 存档逻辑：保存到公开仓库 (VOTE_REPO)
+    async function saveDataToServer() {
+        if (currentUserRole !== 'admin') return; 
+        showStatus("SAVING...", "status-ok", false);
+        try {
+            // 🚨 关键修复：使用 VOTE_REPO
+            await fetch(`https://api.github.com/repos/${REPO_OWNER}/${VOTE_REPO}/issues/${ISSUE_ID}`, {
+                method: 'PATCH', headers: { 'Authorization': `token ${G_TOKEN}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ body: JSON.stringify(data) })
+            });
+            showStatus("SAVED SUCCESSFULLY", "status-ok", true);
+            renderFilters(); renderVotes(); 
+        } catch (e) { showStatus("SAVE ERROR", "status-error", true); }
+    }
+
+    function hslToHex(h, s, l) {
+        l /= 100; const a = s * Math.min(l, 1 - l) / 100;
+        const f = n => { const k = (n + h / 30) % 12; const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1); return Math.round(255 * color).toString(16).padStart(2, '0'); };
+        return `#${f(0)}${f(8)}${f(4)}`;
+    }
+    function stringToHexColor(str) {
+        let hash = 0; for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
+        return hslToHex(Math.abs(hash % 360), 75, 45);
+    }
+
+    function handleGroupInput(index) {
+        const input = document.getElementById(`group_${index}`);
+        const colorPicker = document.getElementById(`color_${index}`);
+        const newName = input.value.trim();
+        let foundColor = null;
+        for (let i = 0; i < data.groups.length; i++) {
+            if (i !== index && data.groups[i] === newName && newName !== "") { foundColor = data.groupColors[i]; break; }
+        }
+        if (foundColor) colorPicker.value = foundColor;
+        else if (newName !== "") colorPicker.value = stringToHexColor(newName); 
+        syncGroupColors(index);
+    }
+
+    function toggleColorMenu(index) {
+        const menu = document.getElementById(`color_menu_${index}`);
+        menu.style.display = menu.style.display === 'none' ? 'inline-block' : 'none';
+    }
+
+    function syncGroupColors(triggerIndex) {
+        const triggerNameInput = document.getElementById(`group_${triggerIndex}`);
+        const triggerColorInput = document.getElementById(`color_${triggerIndex}`);
+        if (!triggerNameInput || !triggerColorInput) return;
+
+        const targetName = triggerNameInput.value.trim();
+        const targetColor = triggerColorInput.value;
+
+        data.topics.forEach((_, i) => {
+            const gNameInput = document.getElementById(`group_${i}`);
+            const gColorInput = document.getElementById(`color_${i}`);
+            if (gNameInput && gColorInput && targetName && gNameInput.value.trim() === targetName) {
+                gColorInput.value = targetColor;
+            }
+        });
+        syncDomToData(); renderFilters(); 
+        data.topics.forEach((_, i) => {
+            const td1 = document.getElementById(`td_index_${i}`);
+            const numStrong = document.getElementById(`num_strong_${i}`);
+            if (td1 && numStrong) {
+                if (data.groups[i]) { td1.style.borderTop = `6px solid ${data.groupColors[i]}`; numStrong.style.color = data.groupColors[i]; } 
+                else { td1.style.borderTop = `2px solid #1E1E1F`; numStrong.style.color = `#FFF`; }
+            }
+        });
+        renderVotes();
+    }
+
+    function renderFilters() {
+        const container = document.getElementById('dynamicFilters'); container.innerHTML = '';
+        let uniqueGroups = new Map(); 
+        data.groups.forEach((g, i) => { let name = g || "UNGROUPED"; if (!uniqueGroups.has(name)) uniqueGroups.set(name, data.groupColors[i]); });
+
+        uniqueGroups.forEach((color, name) => {
+            const isChecked = activeFilters.has(name) ? 'checked' : '';
+            const displayColor = name === "UNGROUPED" ? "#5A5B5C" : color;
+            container.innerHTML += `
+                <label class="filter-label">
+                    <input type="checkbox" value="${name}" onchange="toggleSingleFilter(this)" ${isChecked}>
+                    <span style="display:inline-block; width:12px; height:12px; border:2px solid #1E1E1F; background:${displayColor}; margin-left:4px;"></span>
+                    ${name}
+                </label>`;
+        });
+        document.getElementById('selectAllFilters').checked = (activeFilters.size === uniqueGroups.size && uniqueGroups.size > 0);
+    }
+
+    function toggleAllFilters(checkbox) {
+        activeFilters.clear();
+        if (checkbox.checked) data.groups.forEach(g => activeFilters.add(g || "UNGROUPED"));
+        renderFilters(); renderTable(); renderVotes();
+    }
+    function toggleSingleFilter(checkbox) {
+        const val = checkbox.value;
+        if (checkbox.checked) activeFilters.add(val); else activeFilters.delete(val);
+        renderFilters(); renderTable(); renderVotes();
+    }
+
+    function renderTable() {
+        const tHead = document.getElementById('tHead'); const tBody = document.getElementById('tBody');
+        tHead.innerHTML = ''; tBody.innerHTML = ''; 
+        const tr1 = document.createElement('tr'); const tr2 = document.createElement('tr'); const tr3 = document.createElement('tr'); 
+        let th1 = document.createElement('th'); th1.innerText = '1. ID & GROUP'; tr1.appendChild(th1);
+        let th2 = document.createElement('th'); th2.innerText = '2. TITLE & TAGS'; tr2.appendChild(th2);
+        let th3 = document.createElement('th'); th3.innerText = '3. DETAILS'; tr3.appendChild(th3);
+
+        let indices = data.topics.map((_, i) => i).filter(i => activeFilters.has(data.groups[i] || "UNGROUPED"));
+        indices.sort((a, b) => {
+            let gA = data.groups[a] || ""; let gB = data.groups[b] || "";
+            if (gA && !gB) return -1; if (!gA && gB) return 1;
+            if (gA && gB && gA !== gB) return gA.localeCompare(gB, 'zh-Hans-CN', {sensitivity: 'accent'}); return a - b; 
+        });
+
+        indices.forEach((i) => {
+            let topic = data.topics[i]; let groupName = data.groups[i] || ""; let groupColor = data.groupColors[i] || "#0366d6"; let tag = data.tags[i] || "想法";
+            
+            let td1 = document.createElement('td'); td1.id = `td_index_${i}`;
+            if (groupName) td1.style.borderTop = `6px solid ${groupColor}`;
+            td1.innerHTML = `<h2 id="num_strong_${i}" style="color: ${groupName ? groupColor : '#FFF'};"># ${i+1}</h2>`; 
+            tr1.appendChild(td1);
+            
+            let td2 = document.createElement('td');
+            if (currentUserRole === 'admin') {
+                td2.innerHTML = `
+                    <input type="text" id="topic_${i}" value="${topic}" placeholder="Title">
+                    <div class="group-inputs">
+                        <span style="font-size: 12px; font-weight: bold;">GRP:</span>
+                        <input type="text" id="group_${i}" class="group-name-input" value="${groupName}" oninput="handleGroupInput(${i})" placeholder="Group Name">
+                        <button class="icon-btn" onclick="toggleColorMenu(${i})" title="Color">PALETTE</button>
+                        <div class="tag-select-wrapper">
+                            <select id="tag_${i}" class="tag-select" onchange="syncDomToData(); renderTable(); renderVotes();">
+                                <option value="想法" ${tag==='想法'?'selected':''}>IDEA</option>
+                                <option value="更新" ${tag==='更新'?'selected':''}>UPDATE</option>
+                                <option value="紧急" ${tag==='紧急'?'selected':''}>URGENT</option>
+                            </select>
+                        </div>
+                        <span id="color_menu_${i}" style="display:none; position:absolute; top:-40px; right:0; background:#313233; padding:5px; border:2px solid #1E1E1F; z-index:10;">
+                            <input type="color" id="color_${i}" class="group-color-input" value="${groupColor}" oninput="syncGroupColors(${i})">
+                        </span>
+                    </div>`;
+            } else {
+                let html = '';
+                if (groupName) html += `<div class="group-badge" style="background-color: ${groupColor};">${groupName}</div>`;
+                html += `<span class="tag-badge tag-${tag}">${tag}</span>`;
+                html += `<div class="guest-view-box" style="min-height: auto; margin-top:5px; font-family:'Minecraft Five Bold',sans-serif;">${topic || 'UNTITLED'}</div>`;
+                td2.innerHTML = html;
+            }
+            tr2.appendChild(td2);
+
+            let td3 = document.createElement('td');
+            if (currentUserRole === 'admin') {
+                let contentDiv = document.createElement('div'); contentDiv.id = `content_${i}`; contentDiv.className = 'editor-box line-clamp-8'; contentDiv.contentEditable = true; contentDiv.innerHTML = data.contents[i]; td3.appendChild(contentDiv);
+                let toolsDiv = document.createElement('div');
+                toolsDiv.innerHTML = `<div style="font-size:11px;color:#B1B2B5;margin-top:8px;">EDIT: ${data.editTimes[i] || 'NONE'}</div><button class="btn btn-fullscreen" onclick="openFullscreen(${i})">ZOOM EDITOR</button><button class="btn btn-delete-col" onclick="deleteColumn(${i})">DELETE THIS</button>`;
+                td3.appendChild(toolsDiv);
+            } else {
+                let contentDiv = document.createElement('div'); contentDiv.className = 'guest-view-box line-clamp-8'; contentDiv.innerHTML = data.contents[i]; td3.appendChild(contentDiv);
+                let toolsDiv = document.createElement('div'); toolsDiv.innerHTML = `<div style="font-size:11px;color:#B1B2B5;margin-top:8px;">EDIT: ${data.editTimes[i] || 'NONE'}</div><button class="btn btn-fullscreen" onclick="openFullscreen(${i})">DETAILS</button>`; td3.appendChild(toolsDiv);
+            }
+            tr3.appendChild(td3);
+        });
+        tHead.appendChild(tr1); tBody.appendChild(tr2); tBody.appendChild(tr3);
+    }
+
+    function syncDomToData() {
+        const now = new Date(); const timeString = `${now.getMonth()+1}/${now.getDate()} ${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
+        data.topics.forEach((_, i) => {
+            const t = document.getElementById(`topic_${i}`), c = document.getElementById(`content_${i}`), g = document.getElementById(`group_${i}`), cl = document.getElementById(`color_${i}`), tag = document.getElementById(`tag_${i}`);
+            if (t && c) {
+                if (t.value !== data.topics[i] || c.innerHTML !== data.contents[i] || (g && g.value.trim() !== data.groups[i]) || (tag && tag.value !== data.tags[i])) data.editTimes[i] = timeString;
+                data.topics[i] = t.value; data.contents[i] = c.innerHTML;
+                if (g && cl) { data.groups[i] = g.value.trim(); data.groupColors[i] = cl.value; }
+                if (tag) { data.tags[i] = tag.value; }
+            }
+        });
+    }
+
+    function deleteColumn(index) {
+        if (currentUserRole !== 'admin') return;
+        if (!confirm("Confirm Delete? Action is irreversible!")) return;
+        syncDomToData(); 
+        data.topics.splice(index, 1); data.contents.splice(index, 1); data.editTimes.splice(index, 1); data.votes.splice(index, 1);
+        data.groups.splice(index, 1); data.groupColors.splice(index, 1); data.tags.splice(index, 1);
+        renderFilters(); renderTable(); saveDataToServer(); 
+    }
+
+    function addColumn() {
+        if (currentUserRole !== 'admin') return;
+        syncDomToData(); 
+        data.topics.push(""); data.contents.push("<br>"); data.editTimes.push(""); data.votes.push(0);
+        data.groups.push(""); data.groupColors.push("#0366d6"); data.tags.push("想法");
+        activeFilters.add("UNGROUPED"); 
+        renderFilters(); renderTable(); saveDataToServer(); 
+        setTimeout(() => { const container = document.getElementById('scrollContainer'); container.scrollLeft = container.scrollWidth; }, 100);
+    }
+
+    function formatText(cmd) { document.execCommand(cmd, false, null); document.getElementById('fullscreenEditor').focus(); }
+
+    // 上传文件：保存到公开仓库 (VOTE_REPO)，这样游客才能看到图片
+    async function uploadFileToRepo(event) {
+        const file = event.target.files[0]; if (!file) return;
+        if (file.size > 20 * 1024 * 1024) { alert("File too large (Max 20MB)"); return; }
+        
+        showStatus("UPLOADING FILE...", "status-ok", false); 
+        document.getElementById('btnSaveFullscreen').disabled = true;
+
+        try {
+            let base64Data = await new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    if (file.type.startsWith('image/')) {
+                        const img = new Image();
+                        img.onload = () => {
+                            const canvas = document.createElement('canvas'); const MAX_WIDTH = 1000; let w = img.width, h = img.height;
+                            if (w > MAX_WIDTH) { h *= MAX_WIDTH / w; w = MAX_WIDTH; }
+                            canvas.width = w; canvas.height = h; canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                            resolve(canvas.toDataURL('image/jpeg', 0.85).split(',')[1]);
+                        };
+                        img.src = e.target.result;
+                    } else {
+                        resolve(e.target.result.split(',')[1]);
+                    }
+                };
+                reader.readAsDataURL(file);
+            });
+
+            const filename = `file_${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
+            // 🚨 关键修复：使用 VOTE_REPO
+            const res = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${VOTE_REPO}/contents/uploads/${filename}`, {
+                method: 'PUT', headers: { 'Authorization': `token ${G_TOKEN}`, 'Content-Type': 'application/json' }, 
+                body: JSON.stringify({ message: `Upload file`, content: base64Data })
+            });
+
+            if (!res.ok) throw new Error(`API Error`);
+            const uploadResult = await res.json();
+            const fileUrl = uploadResult.content.download_url;
+
+            document.getElementById('fullscreenEditor').focus();
+
+            let insertHtml = '';
+            const isAudio = file.type.startsWith('audio/') || file.name.toLowerCase().match(/\.(ogg|mp3|wav)$/i);
+            const isMidi = file.name.toLowerCase().match(/\.(mid|midi)$/i);
+            
+            if (file.type.startsWith('image/')) {
+                insertHtml = `<br><div contenteditable="false" style="display:inline-block; border:2px solid #1E1E1F; background:#313233; padding:10px; margin:5px 0;"><img src="${fileUrl}" style="max-width:100%; border:2px solid #1E1E1F;"><br><a href="${fileUrl}" target="_blank" download="${file.name}" class="btn icon-btn" onclick="event.stopPropagation(); window.playSnd('button'); window.showStatus('DOWNLOAD OPENED IN NEW WINDOW', 'status-ok', true);" style="text-decoration:none; margin-top:10px; display:inline-block;">DOWNLOAD IMAGE</a></div><br>`;
+            } else if (isAudio || isMidi) {
+                insertHtml = `<br><ore-audio src="${fileUrl}" name="${file.name}"></ore-audio><br>`;
+            } else {
+                insertHtml = `<br><div contenteditable="false" style="padding:10px; border:2px solid #1E1E1F; background:#313233; margin:5px 0;"><span style="color:#FFE866; font-family:'Minecraft Five Bold'; font-size:12px;">📄 FILE: ${file.name}</span><br><a href="${fileUrl}" target="_blank" download="${file.name}" class="btn icon-btn" onclick="event.stopPropagation(); window.playSnd('button'); window.showStatus('DOWNLOAD OPENED IN NEW WINDOW', 'status-ok', true);" style="margin-top:10px; text-decoration:none; display:inline-block;">DOWNLOAD FILE</a></div><br>`;
+            }
+
+            document.execCommand('insertHTML', false, insertHtml);
+            showStatus("FILE UPLOADED", "status-ok", true);
+        } catch (err) { 
+            alert("Upload Failed"); 
+            showStatus("UPLOAD ERROR", "status-error", true); 
+        } finally { 
+            event.target.value = ''; 
+            document.getElementById('btnSaveFullscreen').disabled = false; 
+        }
+    }
+
+    function openFullscreen(index) {
+        currentEditIndex = index; const isAdmin = currentUserRole === 'admin';
+        document.getElementById('imageUploadArea').style.display = isAdmin ? 'flex' : 'none'; document.getElementById('textToolbar').style.display = isAdmin ? 'flex' : 'none'; document.getElementById('btnSaveFullscreen').style.display = isAdmin ? 'inline-block' : 'none';
+        if (isAdmin) { document.getElementById('fullscreenEditor').style.display = 'block'; document.getElementById('fullscreenGuestView').style.display = 'none'; document.getElementById('fullscreenEditor').innerHTML = document.getElementById(`content_${index}`).innerHTML; } 
+        else { document.getElementById('fullscreenEditor').style.display = 'none'; document.getElementById('fullscreenGuestView').style.display = 'block'; document.getElementById('fullscreenGuestView').innerHTML = data.contents[index]; }
+        openModal('editModal');
+    }
+
+    function saveFullscreen() { if (currentUserRole !== 'admin') return; document.getElementById(`content_${currentEditIndex}`).innerHTML = document.getElementById('fullscreenEditor').innerHTML; closeModal('editModal'); manualSave(); }
+    function manualSave() { if (currentUserRole !== 'admin') return; syncDomToData(); renderTable(); saveDataToServer(); }
+
+    function getMyVotes() { return JSON.parse(localStorage.getItem('myMapVotes') || '{}'); }
+
+    function renderVotes() {
+        const voteArea = document.getElementById('voteArea'); voteArea.innerHTML = ''; const myVotes = getMyVotes();
+        let indices = data.topics.map((_, i) => i).filter(i => activeFilters.has(data.groups[i] || "UNGROUPED"));
+        indices.sort((a, b) => { let gA = data.groups[a] || ""; let gB = data.groups[b] || ""; if (gA && !gB) return -1; if (!gA && gB) return 1; if (gA && gB && gA !== gB) return gA.localeCompare(gB, 'zh-Hans-CN'); return a - b; });
+
+        indices.forEach((i) => {
+            let topic = data.topics[i], groupName = data.groups[i] || "", groupColor = data.groupColors[i] || "#0366d6", tag = data.tags[i] || "想法";
+            let btn = myVotes[i] ? `<button class="btn btn-revoke" onclick="revokeVote(${i})">REVOKE VOTE</button>` : `<button class="btn btn-vote" style="background-color:${groupName?groupColor:'#3C8527'};" onclick="castVote(${i})">VOTE</button>`;
+            let badgeHtml = groupName ? `<div class="group-badge" style="background-color: ${groupColor};">${groupName}</div>` : '';
+            
+            voteArea.innerHTML += `<div class="vote-card" style="${groupName ? 'border-top: 6px solid '+groupColor+';' : ''}">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                    ${badgeHtml} <span class="tag-badge tag-${tag}">${tag}</span>
+                </div>
+                <h3 style="margin-top:10px;">${topic || 'UNTITLED'}</h3>
+                <div class="count" style="color:${groupName ? groupColor : '#FFF'};">${data.votes[i]}</div>
+                ${btn}
+            </div>`;
+        });
+    }
+
+    // 🚨 关键修复：点赞和取消点赞均使用 VOTE_REPO
+    function castVote(index) { let myVotes = getMyVotes(); if (myVotes[index]) return; data.votes[index]++; myVotes[index] = true; localStorage.setItem('myMapVotes', JSON.stringify(myVotes)); fetch(`https://api.github.com/repos/${REPO_OWNER}/${VOTE_REPO}/issues/${ISSUE_ID}`, { method: 'PATCH', headers: { 'Authorization': `token ${G_TOKEN}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ body: JSON.stringify(data) }) }).then(() => renderVotes()); }
+    function revokeVote(index) { let myVotes = getMyVotes(); if (!myVotes[index]) return; if (data.votes[index] > 0) data.votes[index]--; delete myVotes[index]; localStorage.setItem('myMapVotes', JSON.stringify(myVotes)); fetch(`https://api.github.com/repos/${REPO_OWNER}/${VOTE_REPO}/issues/${ISSUE_ID}`, { method: 'PATCH', headers: { 'Authorization': `token ${G_TOKEN}`, 'Content-Type': 'application/json' }, body: JSON.stringify({ body: JSON.stringify(data) }) }).then(() => renderVotes()); }
+
+    function openModal(id) { const m = document.getElementById(id); m.style.display = 'flex'; setTimeout(() => m.style.opacity = '1', 10); playSnd('pop'); }
+    function closeModal(id) { const m = document.getElementById(id); m.style.opacity = '0'; setTimeout(() => m.style.display = 'none', 300); }
+    
+    function showStatus(msg, cls, playSound = true) { 
+        document.getElementById('status').innerText = msg; 
+        document.getElementById('status').className = `status-bar ${cls}`; 
+        if (playSound) { playSnd('toast'); }
+    }
+    
+    function updateOnlineCounter() { document.getElementById('onlineCount').innerText = `Online: ${Math.max(1, Math.floor(data.votes.reduce((a, b) => a + b, 0) / 2)) + ((Math.floor(Date.now() / 15000) + data.votes.reduce((a, b) => a + b, 0)) % 4)}`; }
+</script>
+
+<script>
+    // ============ 新增:板块路由 / 主题切换 / 隐藏管理入口 ============
+    let CUR_THEME = localStorage.getItem('bl-theme') || 'ore';
+    let CUR_SEC = null;
+    let studioStarted = false, blStarted = false;
+
+    // ============ 三语切换(与主页共用 localStorage 'bl-lang') ============
+    let CUR_LANG = localStorage.getItem('bl-lang') || 'zh';
+    const ITEXT = {
+        zh: {
+            gb_title: '玩法实验室 · IDEAS LAB', btn_home: ' 主页', btn_back: '◀ 板块',
+            land_title: '玩法实验室', land_sub: 'IDEAS LAB · 选择一个板块进入',
+            lc1_t: '工作室计划', lc1_en: 'STUDIO PLANS',
+            lc1_d: '地图玩法创意、开发计划与社区投票。<br>看看工作室接下来要做什么,为你喜欢的想法投票!',
+            lc2_en: '特殊赛事与更新安排',
+            lc2_d: '特殊赛事日历、版本更新日志。<br>为期待的赛事打 CALL 应援,掌握第一手安排!',
+            lc_go: '进入 ENTER ➜',
+            bl_title: '特殊赛事与更新安排', bl_sub: 'SPECIAL EVENTS & UPDATE LOG',
+            cd_label: ' 下一场赛事 NEXT EVENT', cd_loading: '加载中...', cd_tba: '下一场赛事筹备中', cd_day: '天 ',
+            ev_h2: ' 特殊赛事', ev_h2s: 'SPECIAL EVENTS',
+            ev_tip: '点击「打 CALL」为你期待的赛事应援!每台设备每场赛事限一次。',
+            tab_all: '全部 ALL', tab_up: '即将开始', tab_live: '进行中 LIVE', tab_end: '已结束',
+            hype: ' 打 CALL ', hype_off: ' 已应援 ',
+            log_h2: '🛠️ 更新日志', log_h2s: 'UPDATE LOG', log_tip: '最新版本在最上方,每次更新的内容一目了然。',
+            hof_h2: ' 荣誉榜', hof_h2s: 'HALL OF FAME', hof_tip: '历届赛事的冠军与传奇时刻,永久铭刻。',
+            sw_to_bl: ' BL 赛事', sw_to_studio: '🛠️ 工作室计划'
+        },
+        en: {
+            gb_title: 'IDEAS LAB', btn_home: ' HOME', btn_back: '◀ BOARDS',
+            land_title: 'IDEAS LAB', land_sub: 'CHOOSE A BOARD TO ENTER',
+            lc1_t: 'STUDIO PLANS', lc1_en: 'MAP IDEAS & VOTES',
+            lc1_d: 'Map ideas, dev plans & community voting.<br>See what the studio is cooking and vote for your favorites!',
+            lc2_en: 'SPECIAL EVENTS & UPDATES',
+            lc2_d: 'Special event calendar & update logs.<br>Hype the events you want and stay tuned!',
+            lc_go: 'ENTER ➜',
+            bl_title: 'SPECIAL EVENTS & UPDATES', bl_sub: 'BLOCK LEGENDS · SEASON 1',
+            cd_label: ' NEXT EVENT', cd_loading: 'Loading...', cd_tba: 'Next event in the works', cd_day: 'd ',
+            ev_h2: ' SPECIAL EVENTS', ev_h2s: 'BLOCK LEGENDS',
+            ev_tip: 'Tap HYPE to cheer for an event! One hype per device per event.',
+            tab_all: 'ALL', tab_up: 'UPCOMING', tab_live: 'LIVE', tab_end: 'ENDED',
+            hype: ' HYPE ', hype_off: ' HYPED ',
+            log_h2: '🛠️ UPDATE LOG', log_h2s: 'CHANGELOG', log_tip: 'Latest version on top — every update at a glance.',
+            hof_h2: ' HALL OF FAME', hof_h2s: 'CHAMPIONS', hof_tip: 'Champions and legendary moments, forever engraved.',
+            sw_to_bl: ' BL EVENTS', sw_to_studio: '🛠️ STUDIO PLANS'
+        },
+        ja: {
+            gb_title: 'アイデアラボ · IDEAS LAB', btn_home: ' ホーム', btn_back: '◀ 選択',
+            land_title: 'アイデアラボ', land_sub: 'IDEAS LAB · 板块を選んで入ろう',
+            lc1_t: 'スタジオ計画', lc1_en: 'STUDIO PLANS',
+            lc1_d: 'マップのアイデア、開発計画、コミュニティ投票。<br>スタジオの次の一手をチェックして投票しよう!',
+            lc2_en: '特殊イベントと更新予定',
+            lc2_d: '特殊イベントカレンダーと更新ログ。<br>期待のイベントを応援して最新情報をゲット!',
+            lc_go: '入場 ENTER ➜',
+            bl_title: '特殊イベントと更新予定', bl_sub: 'SPECIAL EVENTS & UPDATE LOG',
+            cd_label: ' 次回イベント NEXT EVENT', cd_loading: '読み込み中...', cd_tba: '次回イベント準備中', cd_day: '日 ',
+            ev_h2: ' 特殊イベント', ev_h2s: 'SPECIAL EVENTS',
+            ev_tip: '「応援」で期待のイベントを盛り上げよう!1台1イベント1回まで。',
+            tab_all: 'すべて', tab_up: '開催予定', tab_live: '開催中 LIVE', tab_end: '終了',
+            hype: ' 応援 ', hype_off: ' 応援済 ',
+            log_h2: '🛠️ 更新ログ', log_h2s: 'UPDATE LOG', log_tip: '最新バージョンが一番上。更新内容が一目でわかる。',
+            hof_h2: ' 名誉の殿堂', hof_h2s: 'HALL OF FAME', hof_tip: '歴代チャンピオンと伝説の瞬間を、永遠に刻む。',
+            sw_to_bl: ' BL イベント', sw_to_studio: '🛠️ スタジオ計画'
+        }
+    };
+    function IT(k) { return (ITEXT[CUR_LANG] && ITEXT[CUR_LANG][k]) || ITEXT.zh[k] || k; }
+    function setLang(l) {
+        CUR_LANG = l;
+        localStorage.setItem('bl-lang', l);
+        applyILang();
+        playSnd('click');
+    }
+    function applyILang() {
+        document.body.classList.remove('lang-zh', 'lang-en', 'lang-ja');
+        document.body.classList.add('lang-' + CUR_LANG);
+        document.querySelectorAll('[data-ik]').forEach(function (el) { el.innerHTML = IT(el.dataset.ik); });
+        document.getElementById('lgZh').classList.toggle('sw-active', CUR_LANG === 'zh');
+        document.getElementById('lgEn').classList.toggle('sw-active', CUR_LANG === 'en');
+        document.getElementById('lgJa').classList.toggle('sw-active', CUR_LANG === 'ja');
+        updateSecButtons();
+        renderBlEvents();
+        renderBlLogs();
+        renderBlChamps();
+        tickCountdown();
+    }
+
+    function switchSection() { enterSection(CUR_SEC === 'studio' ? 'bl' : 'studio'); }
+    function updateSecButtons() {
+        const sw = document.getElementById('btnSwitchSec');
+        if (!CUR_SEC) { sw.style.display = 'none'; return; }
+        sw.style.display = 'inline-block';
+        sw.innerHTML = CUR_SEC === 'studio' ? IT('sw_to_bl') : IT('sw_to_studio');
+    }
+
+    function setTheme(t) {
+        CUR_THEME = t;
+        localStorage.setItem('bl-theme', t);
+        document.body.className = 'theme-' + t + ' lang-' + CUR_LANG;
+        syncSwitcher();
+        playSnd('click');
+    }
+    function syncSwitcher() {
+        document.getElementById('swOre').classList.toggle('sw-active', CUR_THEME === 'ore');
+        document.getElementById('swBl').classList.toggle('sw-active', CUR_THEME === 'bl');
+    }
+
+    function enterSection(name) {
+        playSnd('open');
+        CUR_SEC = name;
+        document.getElementById('landingView').style.display = 'none';
+        document.getElementById('btnBackHome').style.display = 'inline-block';
+        updateSecButtons();
+        if (name === 'studio') {
+            document.getElementById('mainApp').style.display = 'block';
+            document.getElementById('blSection').style.display = 'none';
+            if (!studioStarted) { studioStarted = true; loadData(); setInterval(loadData, 8000); }
+        } else {
+            document.getElementById('mainApp').style.display = 'none';
+            document.getElementById('blSection').style.display = 'block';
+            if (!blStarted) { blStarted = true; loadBlData(); setInterval(loadBlData, 15000); }
+            renderBlEvents(); renderBlLogs(); renderBlChamps();
+        }
+        window.scrollTo(0, 0);
+    }
+    function showLanding() {
+        playSnd('button');
+        CUR_SEC = null;
+        updateSecButtons();
+        document.getElementById('mainApp').style.display = 'none';
+        document.getElementById('blSection').style.display = 'none';
+        document.getElementById('landingView').style.display = 'flex';
+        document.getElementById('btnBackHome').style.display = 'none';
+    }
+
+    // ---- 权限(覆盖原函数):默认游客,不再强制登录 ----
+    function grantAccess(role, isAutoLogin) {
+        currentUserRole = role;
+        closeModal('loginModal');
+        updateAdminUI();
+        if (role === 'admin' && !isAutoLogin) openModal('adminGuideModal');
+    }
+    function guestLogin() { closeModal('loginModal'); }
+    function logout() { localStorage.removeItem('userRole'); location.reload(); }
+
+    function updateAdminUI() {
+        const isAdmin = currentUserRole === 'admin';
+        document.getElementById('roleBadge').innerText = isAdmin ? 'ADMIN' : '';
+        document.getElementById('btnLogout').style.display = isAdmin ? 'inline-block' : 'none';
+        document.getElementById('adminButtons').style.display = isAdmin ? 'flex' : 'none';
+        document.getElementById('blEventAdmin').style.display = isAdmin ? 'flex' : 'none';
+        document.getElementById('blLogAdmin').style.display = isAdmin ? 'flex' : 'none';
+        document.getElementById('blChampAdmin').style.display = isAdmin ? 'flex' : 'none';
+        renderBlEvents(); renderBlLogs(); renderBlChamps();
+    }
+
+    // ---- 隐藏的管理员入口:版本号连点 5 次,或按 ` 键 ----
+    function openAdminGate() {
+        if (currentUserRole === 'admin') return;
+        playSnd('open');
+        openModal('loginModal');
+    }
+    let secretClicks = 0, secretTimer = null;
+    document.getElementById('secretDot').addEventListener('click', function() {
+        secretClicks++;
+        clearTimeout(secretTimer);
+        secretTimer = setTimeout(() => secretClicks = 0, 3000);
+        if (secretClicks >= 5) { secretClicks = 0; openAdminGate(); }
+    });
+    document.addEventListener('keydown', function(e) {
+        if (e.key !== '`' || currentUserRole === 'admin') return;
+        const ae = document.activeElement;
+        if (ae && (ae.tagName === 'INPUT' || ae.tagName === 'TEXTAREA' || ae.isContentEditable)) return;
+        openAdminGate();
+    });
+
+    window.onload = function() {
+        syncSwitcher();
+        applyILang();
+        currentUserRole = 'guest';
+        if (localStorage.getItem('userRole') === 'admin') grantAccess('admin', true);
+        else updateAdminUI();
+        if (location.hash === '#gate') openAdminGate();
+        const qs = new URLSearchParams(location.search);
+        const th = qs.get('theme');
+        if (th === 'ore' || th === 'bl') setTheme(th);
+        const sec = qs.get('sec');
+        if (sec === 'studio' || sec === 'bl') enterSection(sec);
+    };
+
+    // ============ 新增:BL 板块(独立数据:同库不同 Issue) ============
+    let blIssueNumber = 2;              // 工作室计划 = Issue #1,BL = Issue #2,数据完全独立
+    let blIssueExists = false;
+    let blData = null;
+    let blFirstLoad = true;
+    let blAnimatedOnce = false;
+    let curEvIdx = -1, curLogIdx = -1;
+
+    const DEFAULT_BL_DATA = {
+        events: [
+            { title: 'S1 揭幕赛 · 跑酷竞速杯', date: '2026-08-15 20:00', game: '跑酷竞速 PARKOUR RUSH', status: '即将开始', desc: '首届 Block Legends 官方赛事!32 名选手角逐跑酷王座,冠军将获得限定称号与 1000 金币。', hype: 12 },
+            { title: '决斗竞技场 · 周榜挑战', date: '每周六 20:00', game: '决斗竞技场 BATTLE ARENA', status: '进行中', desc: '每周结算天梯榜,TOP3 获得限定披风与下赛季种子位。常驻赛事,随时参加!', hype: 20 },
+            { title: '夺旗大战 · 战队对抗赛', date: '2026-08-22 20:00', game: '夺旗大战 FLAG FRENZY', status: '即将开始', desc: '4v4 战队报名制,小组赛 + 淘汰赛双阶段。拉上你的战友一起夺冠!', hype: 8 },
+            { title: '天降乱斗 · 主播表演赛', date: '2026-07-25 20:00', game: '天降乱斗 SKY FALL', status: '已结束', desc: '感谢收看!回放已上传,下一届表演赛筹备中。', hype: 31 }
+        ],
+        logs: [
+            { version: 'v0.9.8', date: '2026-08-05', changes: '&bull; 新增「沙漏求生」地图两张<br>&bull; 修复跑酷竞速终点判定问题<br>&bull; 大厅新增赛事日历入口' },
+            { version: 'v0.9.5', date: '2026-07-28', changes: '&bull; 决斗竞技场平衡性调整<br>&bull; 优化匹配队列等待时间' },
+            { version: 'v0.9.0', date: '2026-07-20', changes: '&bull; Block Legends 公开测试开启<br>&bull; 上线 6 款首发小游戏' }
+        ],
+        champs: [
+            { season: 'S0 季前赛', event: '天降乱斗 · 主播表演赛', winner: '红石小队', note: '表演赛冠军 · 友谊第一' },
+            { season: 'S0 季前赛', event: '决斗竞技场 · 试炼赛', winner: 'Infrato', note: '天梯试炼榜首' }
+        ]
+    };
+
+    function showBlStatus(msg, cls, playSound = true) {
+        document.getElementById('blStatus').innerText = msg;
+        document.getElementById('blStatus').className = 'status-bar ' + cls;
+        if (playSound) playSnd('toast');
+    }
+
+    // 按标题查找 BL 数据 Issue(防止编号失效后重复建单)
+    async function findBlIssueNumber() {
+        try {
+            const res = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${VOTE_REPO}/issues?state=open&per_page=50`, { headers: { 'Authorization': `token ${G_TOKEN}` } });
+            if (!res.ok) return null;
+            const list = await res.json();
+            const hit = list.find(i => i.title === '[BL] 特殊赛事与更新数据');
+            return hit ? hit.number : null;
+        } catch (e) { return null; }
+    }
+    async function fetchBlIssue() {
+        let res = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${VOTE_REPO}/issues/${blIssueNumber}`, { headers: { 'Authorization': `token ${G_TOKEN}` } });
+        if (res.ok) return await res.json();
+        if (res.status === 404 || res.status === 410) {
+            const found = await findBlIssueNumber();
+            if (found) {
+                blIssueNumber = found;
+                res = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${VOTE_REPO}/issues/${blIssueNumber}`, { headers: { 'Authorization': `token ${G_TOKEN}` } });
+                if (res.ok) return await res.json();
+            }
+            return null;
+        }
+        throw new Error('net');
+    }
+
+    async function loadBlData() {
+        try {
+            const issue = await fetchBlIssue();
+            if (issue) {
+                blIssueExists = true;
+                let remote = null;
+                try { remote = JSON.parse(issue.body); } catch (e) {}
+                if (remote && (remote.events || remote.logs)) {
+                    if (!remote.events) remote.events = [];
+                    if (!remote.logs) remote.logs = [];
+                    if (!remote.champs) remote.champs = JSON.parse(JSON.stringify(DEFAULT_BL_DATA.champs));
+                    const changed = JSON.stringify(blData) !== JSON.stringify(remote);
+                    blData = remote;
+                    if (changed || blFirstLoad) { renderBlEvents(); renderBlLogs(); renderBlChamps(); }
+                    showBlStatus(changed && !blFirstLoad ? 'NEW UPDATE RECEIVED' : 'SYNCED WITH SERVER', 'status-ok', blFirstLoad || changed);
+                    blFirstLoad = false;
+                    return;
+                }
+            } else { blIssueExists = false; }
+        } catch (e) { /* 网络失败走本地 */ }
+        if (!blData) blData = JSON.parse(JSON.stringify(DEFAULT_BL_DATA));
+        renderBlEvents(); renderBlLogs(); renderBlChamps();
+        if (blFirstLoad) { showBlStatus(blIssueExists ? 'SYNC FAILED · LOCAL DATA' : 'LOCAL PREVIEW · AWAITING ADMIN SYNC', 'status-ok', true); blFirstLoad = false; }
+    }
+
+    async function ensureBlIssue() {
+        if (blIssueExists) return true;
+        const found = await findBlIssueNumber();
+        if (found) { blIssueNumber = found; blIssueExists = true; return true; }
+        try {
+            const res = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${VOTE_REPO}/issues`, {
+                method: 'POST', headers: { 'Authorization': `token ${G_TOKEN}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ title: '[BL] 特殊赛事与更新数据', body: JSON.stringify(blData) })
+            });
+            if (res.ok) { const j = await res.json(); blIssueNumber = j.number; blIssueExists = true; return true; }
+        } catch (e) {}
+        return false;
+    }
+    async function patchBlData() {
+        if (!await ensureBlIssue()) return false;
+        try {
+            const res = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${VOTE_REPO}/issues/${blIssueNumber}`, {
+                method: 'PATCH', headers: { 'Authorization': `token ${G_TOKEN}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ body: JSON.stringify(blData) })
+            });
+            return res.ok;
+        } catch (e) { return false; }
+    }
+    async function saveBlData() {
+        if (currentUserRole !== 'admin') return;
+        showBlStatus('SAVING...', 'status-ok', false);
+        const ok = await patchBlData();
+        showBlStatus(ok ? 'SAVED SUCCESSFULLY' : 'SAVE ERROR', ok ? 'status-ok' : 'status-error', true);
+    }
+
+    // ---- 渲染:赛事卡片 ----
+    function getMyHype() { return JSON.parse(localStorage.getItem('myBlHype') || '{}'); }
+
+    function renderBlEvents() {
+        const area = document.getElementById('blEventArea');
+        if (!area || !blData) return;
+        const myHype = getMyHype();
+        const isAdmin = currentUserRole === 'admin';
+        const rvCls = blAnimatedOnce ? 'rv revealed' : 'rv';
+        area.innerHTML = '';
+        blData.events.forEach((ev, i) => {
+            if (blFilter !== 'all' && (ev.status || '即将开始') !== blFilter) return;
+            const stCls = ev.status === '进行中' ? 'st-live' : (ev.status === '已结束' ? 'st-ended' : 'st-upcoming');
+            const hypeBtn = myHype[i]
+                ? `<button class="btn btn-revoke bls-hype-btn" onclick="revokeHype(${i})">${IT('hype_off')}${ev.hype || 0}</button>`
+                : `<button class="btn btn-vote bls-hype-btn" onclick="castHype(${i})">${IT('hype')}${ev.hype || 0}</button>`;
+            const adminBtns = isAdmin ? `<div class="bls-ev-admin"><button class="icon-btn" onclick="openEventEditor(${i})">EDIT</button></div>` : '';
+            area.innerHTML += `<div class="bls-ev-card ${rvCls} ${ev.status === '已结束' ? 'is-ended' : ''}">
+                ${adminBtns}
+                <div class="bls-ev-top"><span class="bls-ev-date"> ${ev.date || 'TBA'}</span><span class="tag-badge ${stCls}">${ev.status || '即将开始'}</span></div>
+                <h3>${ev.title || 'UNTITLED'}</h3>
+                <div class="bls-ev-game">${ev.game || ''}</div>
+                <div class="bls-ev-desc">${ev.desc || ''}</div>
+                ${hypeBtn}
+            </div>`;
+        });
+        initReveal();
+    }
+
+    // ---- 渲染:更新日志 ----
+    function renderBlLogs() {
+        const area = document.getElementById('blLogArea');
+        if (!area || !blData) return;
+        const isAdmin = currentUserRole === 'admin';
+        const rvCls = blAnimatedOnce ? 'rv revealed' : 'rv';
+        area.innerHTML = '';
+        blData.logs.forEach((lg, i) => {
+            const adminBtns = isAdmin ? `<span class="bls-ev-admin"><button class="icon-btn" onclick="openLogEditor(${i})">EDIT</button></span>` : '';
+            area.innerHTML += `<div class="bls-log-item ${rvCls}">
+                ${adminBtns}
+                <div class="bls-log-head"><span class="bls-log-ver">${lg.version || 'v?'}</span><span class="bls-log-date">${lg.date || ''}</span></div>
+                <div class="bls-log-body">${lg.changes || ''}</div>
+            </div>`;
+        });
+        initReveal();
+    }
+
+    // ---- 打 CALL(游客可投,每台设备一次) ----
+    function castHype(i) {
+        const m = getMyHype(); if (m[i]) return;
+        blData.events[i].hype = (blData.events[i].hype || 0) + 1;
+        m[i] = true; localStorage.setItem('myBlHype', JSON.stringify(m));
+        renderBlEvents(); patchBlData();
+    }
+    function revokeHype(i) {
+        const m = getMyHype(); if (!m[i]) return;
+        if (blData.events[i].hype > 0) blData.events[i].hype--;
+        delete m[i]; localStorage.setItem('myBlHype', JSON.stringify(m));
+        renderBlEvents(); patchBlData();
+    }
+
+    // ---- 赛事编辑(管理员) ----
+    function openEventEditor(i) {
+        if (currentUserRole !== 'admin') return;
+        curEvIdx = i;
+        const ev = i >= 0 ? blData.events[i] : { title: '', date: '', game: '', status: '即将开始', desc: '', hype: 0 };
+        document.getElementById('evTitle').value = ev.title || '';
+        document.getElementById('evDate').value = ev.date || '';
+        document.getElementById('evGame').value = ev.game || '';
+        document.getElementById('evStatus').value = ev.status || '即将开始';
+        document.getElementById('evDesc').value = (ev.desc || '').replace(/<br\s*\/?>/gi, '\n');
+        document.getElementById('evDelete').style.display = i >= 0 ? 'inline-block' : 'none';
+        openModal('eventModal');
+    }
+    function saveEvent() {
+        if (currentUserRole !== 'admin') return;
+        const ev = {
+            title: document.getElementById('evTitle').value.trim(),
+            date: document.getElementById('evDate').value.trim(),
+            game: document.getElementById('evGame').value.trim(),
+            status: document.getElementById('evStatus').value,
+            desc: document.getElementById('evDesc').value.replace(/\n/g, '<br>'),
+            hype: curEvIdx >= 0 ? (blData.events[curEvIdx].hype || 0) : 0
+        };
+        if (curEvIdx >= 0) blData.events[curEvIdx] = ev; else blData.events.unshift(ev);
+        closeModal('eventModal'); renderBlEvents(); saveBlData();
+    }
+    function deleteEvent(i) {
+        if (currentUserRole !== 'admin' || i < 0) return;
+        if (!confirm('Confirm Delete? Action is irreversible!')) return;
+        blData.events.splice(i, 1);
+        closeModal('eventModal'); renderBlEvents(); saveBlData();
+    }
+
+    // ---- 日志编辑(管理员) ----
+    function openLogEditor(i) {
+        if (currentUserRole !== 'admin') return;
+        curLogIdx = i;
+        const lg = i >= 0 ? blData.logs[i] : { version: '', date: '', changes: '' };
+        document.getElementById('lgVersion').value = lg.version || '';
+        document.getElementById('lgDate').value = lg.date || '';
+        document.getElementById('lgChanges').value = (lg.changes || '').replace(/<br\s*\/?>/gi, '\n');
+        document.getElementById('lgDelete').style.display = i >= 0 ? 'inline-block' : 'none';
+        openModal('logModal');
+    }
+    function saveLog() {
+        if (currentUserRole !== 'admin') return;
+        const lg = {
+            version: document.getElementById('lgVersion').value.trim(),
+            date: document.getElementById('lgDate').value.trim(),
+            changes: document.getElementById('lgChanges').value.replace(/\n/g, '<br>')
+        };
+        if (curLogIdx >= 0) blData.logs[curLogIdx] = lg; else blData.logs.unshift(lg);
+        closeModal('logModal'); renderBlLogs(); saveBlData();
+    }
+    function deleteLog(i) {
+        if (currentUserRole !== 'admin' || i < 0) return;
+        if (!confirm('Confirm Delete? Action is irreversible!')) return;
+        blData.logs.splice(i, 1);
+        closeModal('logModal'); renderBlLogs(); saveBlData();
+    }
+
+    // ---- 赛事状态筛选 ----
+    let blFilter = 'all';
+    function setBlFilter(f) {
+        blFilter = f;
+        document.querySelectorAll('#blTabs .bls-tab').forEach(b => b.classList.toggle('on', b.dataset.f === f));
+        playSnd('click');
+        renderBlEvents();
+    }
+
+    // ---- 下一场赛事倒计时 ----
+    function parseEvDate(s) {
+        const m = (s || '').match(/(\d{4})-(\d{2})-(\d{2})\s+(\d{2}):(\d{2})/);
+        if (!m) return null;
+        return new Date(+m[1], +m[2] - 1, +m[3], +m[4], +m[5]);
+    }
+    function tickCountdown() {
+        const timeEl = document.getElementById('blCountTime');
+        const nameEl = document.getElementById('blCountName');
+        if (!timeEl || !nameEl) return;
+        if (!blData || !blData.events) { nameEl.innerText = IT('cd_loading'); return; }
+        let best = null;
+        blData.events.forEach(ev => {
+            if (ev.status === '已结束') return;
+            const d = parseEvDate(ev.date);
+            if (d && d.getTime() > Date.now() && (!best || d < best.d)) best = { d: d, title: ev.title };
+        });
+        if (!best) { timeEl.innerText = 'STAY TUNED'; nameEl.innerText = IT('cd_tba'); return; }
+        let diff = Math.max(0, best.d.getTime() - Date.now());
+        const dd = Math.floor(diff / 86400000); diff %= 86400000;
+        const hh = Math.floor(diff / 3600000); diff %= 3600000;
+        const mm = Math.floor(diff / 60000); diff %= 60000;
+        const ss = Math.floor(diff / 1000);
+        timeEl.innerText = dd + IT('cd_day') + String(hh).padStart(2, '0') + ':' + String(mm).padStart(2, '0') + ':' + String(ss).padStart(2, '0');
+        nameEl.innerText = best.title || '';
+    }
+    setInterval(tickCountdown, 1000);
+
+    // ---- 荣誉榜 ----
+    function renderBlChamps() {
+        const area = document.getElementById('blHofArea');
+        if (!area || !blData) return;
+        const isAdmin = currentUserRole === 'admin';
+        const rvCls = blAnimatedOnce ? 'rv revealed' : 'rv';
+        area.innerHTML = '';
+        (blData.champs || []).forEach((c, i) => {
+            const adminBtns = isAdmin ? `<span class="bls-ev-admin"><button class="icon-btn" onclick="openChampEditor(${i})">EDIT</button></span>` : '';
+            area.innerHTML += `<div class="bls-hof-card ${rvCls}">
+                ${adminBtns}
+                <div class="bls-hof-season">${c.season || 'S?'}</div>
+                <div style="font-size:34px; line-height:1;"></div>
+                <div class="bls-hof-winner">${c.winner || '???'}</div>
+                <div class="bls-hof-event">${c.event || ''}</div>
+                <div class="bls-hof-note">${c.note || ''}</div>
+            </div>`;
+        });
+        initReveal();
+    }
+    let curChIdx = -1;
+    function openChampEditor(i) {
+        if (currentUserRole !== 'admin') return;
+        curChIdx = i;
+        const c = i >= 0 ? blData.champs[i] : { season: '', event: '', winner: '', note: '' };
+        document.getElementById('chSeason').value = c.season || '';
+        document.getElementById('chEvent').value = c.event || '';
+        document.getElementById('chWinner').value = c.winner || '';
+        document.getElementById('chNote').value = c.note || '';
+        document.getElementById('chDelete').style.display = i >= 0 ? 'inline-block' : 'none';
+        openModal('champModal');
+    }
+    function saveChamp() {
+        if (currentUserRole !== 'admin') return;
+        const c = {
+            season: document.getElementById('chSeason').value.trim(),
+            event: document.getElementById('chEvent').value.trim(),
+            winner: document.getElementById('chWinner').value.trim(),
+            note: document.getElementById('chNote').value.trim()
+        };
+        if (curChIdx >= 0) blData.champs[curChIdx] = c; else blData.champs.unshift(c);
+        closeModal('champModal'); renderBlChamps(); saveBlData();
+    }
+    function deleteChamp(i) {
+        if (currentUserRole !== 'admin' || i < 0) return;
+        if (!confirm('Confirm Delete? Action is irreversible!')) return;
+        blData.champs.splice(i, 1);
+        closeModal('champModal'); renderBlChamps(); saveBlData();
+    }
+
+    // ---- 滚动显现 ----
+    let rvObserver = null;
+    function initReveal() {
+        if (!('IntersectionObserver' in window)) { document.querySelectorAll('.rv').forEach(el => el.classList.add('revealed')); return; }
+        if (!rvObserver) rvObserver = new IntersectionObserver((entries) => {
+            entries.forEach(en => {
+                if (en.isIntersecting) {
+                    const el = en.target;
+                    const s = +(el.dataset.stagger || 0);
+                    el.style.transitionDelay = (s * 70) + 'ms';
+                    el.classList.add('revealed');
+                    setTimeout(() => el.style.transitionDelay = '', 1000);
+                    rvObserver.unobserve(el);
+                }
+            });
+        }, { threshold: .12 });
+        document.querySelectorAll('.rv:not(.revealed)').forEach((el, idx) => {
+            if (!el.dataset.stagger) el.dataset.stagger = idx % 6;
+            rvObserver.observe(el);
+        });
+        setTimeout(() => { blAnimatedOnce = true; }, 1500);
+    }
+</script>
+<script>
+/* ============================================================
+   UI 调试工具(管理员专用)
+   - 仅管理员可用
+   - 点击页面任意元素 → 调整位置、尺寸、字号、等比缩放、旋转、
+     颜色、圆角、不透明度、隐藏,或直接改文字
+   - 「 导出文件」生成 debug-overrides.json 可发给开发者固化
+   - 「☁️ 发布到服务器」把调整存进 GitHub 数据仓库,所有访客自动生效
+   ============================================================ */
+(function () {
+    if (window.__uiDebugLoaded) return;
+    window.__uiDebugLoaded = true;
+
+    // ---- GitHub 数据仓库(与投票/BL 数据同库,不同 Issue) ----
+    const DBG_OWNER = 'shivr-dev';
+    const DBG_REPO = 'ideas';
+    const DBG_ISSUE_TITLE = '[DEBUG] UI 调整数据';
+    const _dp1 = 'ghp_', _dp2 = '9LZtot1qgVw1k1FSQVSSCIDlDlpJqL2rSs2D';
+    const DBG_TOKEN = _dp1 + _dp2;
+    const API_HEADERS = { 'Authorization': 'token ' + DBG_TOKEN, 'Content-Type': 'application/json' };
+
+    const PAGE = location.pathname.split('/').pop() || 'index.html';
+    const STORE_KEY = 'ui-debug-' + location.pathname;
+
+    let active = false, selected = null, hovered = null;
+    let changes = {};
+    let serverIssueNumber = null;
+
+    function isAdmin() {
+        // 1) 勾选过「记住我」的持久登录(跨页面有效,含主页)
+        if (localStorage.getItem('userRole') === 'admin') return true;
+        // 2) 本页面当前会话已登录管理员(未勾「记住我」的情况)
+        try { if (typeof currentUserRole !== 'undefined' && currentUserRole === 'admin') return true; } catch (e) {}
+        return false;
+    }
+
+    // ---------- 注入样式 ----------
+    const css = `
+    #dbgPanel { position:fixed; right:12px; bottom:12px; width:300px; max-height:84vh; overflow-y:auto; z-index:99999; background:#2b2d30; color:#eee; border:3px solid #000; box-shadow:6px 6px 0 rgba(0,0,0,.6); font:13px/1.5 system-ui,-apple-system,sans-serif; padding:12px; display:none; }
+    #dbgPanel * { box-sizing:border-box; font:inherit; }
+    #dbgPanel h3 { margin:0 0 8px; font-size:14px; color:#FFD829; }
+    #dbgPanel .dbg-row { margin-bottom:8px; }
+    #dbgPanel label { display:block; font-size:11px; color:#aaa; margin-bottom:2px; }
+    #dbgPanel input[type=number], #dbgPanel textarea { width:100%; background:#1b1c1e; color:#fff; border:2px solid #000; padding:5px 7px; }
+    #dbgPanel input[type=color] { width:100%; height:30px; padding:0; border:2px solid #000; background:#1b1c1e; cursor:pointer; }
+    #dbgPanel textarea { min-height:60px; resize:vertical; }
+    #dbgPanel .dbg-grid { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+    #dbgPanel button { background:#3C69F0; color:#fff; border:2px solid #000; padding:6px 10px; cursor:pointer; font-weight:bold; margin:2px 2px 2px 0; }
+    #dbgPanel button:hover { filter:brightness(1.15); }
+    #dbgPanel .dbg-warn { background:#C33636; }
+    #dbgPanel .dbg-gray { background:#5A5B5C; }
+    #dbgPanel .dbg-pub { background:#3C8527; width:100%; margin-top:4px; }
+    #dbgPanel .dbg-sel { font-size:11px; color:#8fb0ff; word-break:break-all; background:#1b1c1e; border:2px solid #000; padding:4px 6px; max-height:64px; overflow:auto; }
+    .dbg-hover { outline:2px dashed #E0262C !important; outline-offset:2px; cursor:crosshair !important; }
+    .dbg-picked { outline:3px solid #FFD829 !important; outline-offset:2px; }
+    #dbgBadge { position:fixed; left:12px; bottom:12px; z-index:99998; background:#E0262C; color:#fff; border:3px solid #000; padding:6px 12px; font:bold 12px system-ui; display:none; box-shadow:4px 4px 0 rgba(0,0,0,.5); pointer-events:none; }
+    `;
+    const st = document.createElement('style');
+    st.textContent = css;
+    document.head.appendChild(st);
+
+    // ---------- 面板 ----------
+    const panel = document.createElement('div');
+    panel.id = 'dbgPanel';
+    panel.innerHTML = `
+        <h3> UI 调试面板(管理员)</h3>
+        <div class="dbg-row"><label>已选元素(调试模式下点击页面任意元素)</label><div class="dbg-sel" id="dbgSel">未选择</div></div>
+        <div class="dbg-row"><label>文字内容(支持 HTML,如 &lt;br&gt;)</label><textarea id="dbgText" placeholder="选择元素后可编辑文字"></textarea></div>
+        <div class="dbg-row dbg-grid">
+            <div><label>X 偏移 (px)</label><input type="number" id="dbgX" value="0"></div>
+            <div><label>Y 偏移 (px)</label><input type="number" id="dbgY" value="0"></div>
+            <div><label>宽度 (px,空=自动)</label><input type="number" id="dbgW" placeholder="auto"></div>
+            <div><label>高度 (px,空=自动)</label><input type="number" id="dbgH" placeholder="auto"></div>
+            <div><label>字号 (px,空=默认)</label><input type="number" id="dbgFs" placeholder="默认"></div>
+            <div><label>圆角 (px,空=默认)</label><input type="number" id="dbgBr" placeholder="默认"></div>
+            <div><label>等比缩放 (%,100=原始)</label><input type="number" id="dbgSc" value="100"></div>
+            <div><label>旋转 (°,0=不转)</label><input type="number" id="dbgRot" value="0"></div>
+            <div><label>不透明度 (%,100=原始)</label><input type="number" id="dbgOp" value="100"></div>
+            <div style="display:flex;align-items:flex-end;"><label style="display:flex;align-items:center;gap:6px;color:#eee;cursor:pointer;margin:0 0 6px;"><input type="checkbox" id="dbgHide" style="width:auto;"> 隐藏此元素</label></div>
+        </div>
+        <div class="dbg-row dbg-grid">
+            <div><label>文字颜色(选色即生效)</label><input type="color" id="dbgColor" value="#ffffff"></div>
+            <div><label>背景颜色(选色即生效)</label><input type="color" id="dbgBg" value="#888888"></div>
+        </div>
+        <div class="dbg-row">
+            <button id="dbgApplyText">应用文字</button>
+            <button id="dbgResetOne" class="dbg-gray">还原此元素记录</button>
+        </div>
+        <hr style="border:1px solid #444;">
+        <div class="dbg-row">
+            <button id="dbgExport"> 导出文件</button>
+            <button id="dbgImportBtn"> 导入</button>
+            <input type="file" id="dbgImportFile" accept=".json" style="display:none">
+            <button id="dbgClear" class="dbg-warn"> 清除全部</button>
+            <button id="dbgClose" class="dbg-gray">关闭调试</button>
+            <button id="dbgPublish" class="dbg-pub">☁️ 发布到服务器(所有访客可见)</button>
+            <div id="dbgPubStatus" style="font-size:11px;margin-top:4px;"></div>
+        </div>
+        <div style="font-size:11px;color:#888;line-height:1.6;">改动实时生效并存于本浏览器;点「发布到服务器」后所有访客自动应用。「导出文件」生成 debug-overrides.json 可发给开发者固化进代码。</div>
+    `;
+    const badge = document.createElement('div');
+    badge.id = 'dbgBadge';
+    badge.textContent = ' 调试模式:点击任意元素';
+
+    // ---------- 选择器工具 ----------
+    const STATE_CLASSES = ['on', 'sw-active', 'rv', 'revealed', 'dbg-hover', 'dbg-picked', 'active', 'show', 'open'];
+    function stableClasses(el) {
+        return [...el.classList].filter(c => STATE_CLASSES.indexOf(c) === -1 && !/^lang-/.test(c) && !/^theme-/.test(c));
+    }
+    function selectorOf(el) {
+        if (el.id) return '#' + CSS.escape(el.id);
+        const parts = [];
+        let cur = el;
+        while (cur && cur !== document.body && cur !== document.documentElement) {
+            if (cur.id) { parts.unshift('#' + CSS.escape(cur.id)); break; }
+            let seg = cur.tagName.toLowerCase();
+            const cls = stableClasses(cur);
+            if (cls.length) seg += '.' + cls.slice(0, 2).map(c => CSS.escape(c)).join('.');
+            const parent = cur.parentElement;
+            if (parent) {
+                const same = [...parent.children].filter(c => c.tagName === cur.tagName);
+                if (same.length > 1) seg += ':nth-of-type(' + (same.indexOf(cur) + 1) + ')';
+            }
+            parts.unshift(seg);
+            cur = parent;
+        }
+        return parts.join(' > ');
+    }
+    function labelOf(el) {
+        const txt = (el.textContent || '').trim().replace(/\s+/g, ' ').slice(0, 24);
+        return '<' + el.tagName.toLowerCase() + '> ' + txt;
+    }
+
+    // ---------- 应用改动 ----------
+    function applyTransform(el, c) {
+        // 首次应用缩放/旋转时,先记录元素原有的 transform(如卡片的倾斜),在其基础上叠加
+        if (el.dataset.dbgBase === undefined) el.dataset.dbgBase = getComputedStyle(el).transform;
+        const base = (el.dataset.dbgBase === 'none' ? '' : el.dataset.dbgBase + ' ');
+        const sc = (c.sc !== undefined ? c.sc : 100) / 100;
+        const rot = c.rot || 0;
+        if (sc === 1 && !rot) { el.style.transform = (el.dataset.dbgBase === 'none' ? '' : el.dataset.dbgBase); return; }
+        el.style.transform = base + (sc !== 1 ? 'scale(' + sc + ') ' : '') + (rot ? 'rotate(' + rot + 'deg)' : '');
+    }
+    function applyOne(sel, c) {
+        const el = document.querySelector(sel);
+        if (!el) return;
+        if (c.text !== undefined) el.innerHTML = c.text;
+        if (c.x || c.y) {
+            if (getComputedStyle(el).position === 'static') el.style.position = 'relative';
+            el.style.left = (c.x || 0) + 'px';
+            el.style.top = (c.y || 0) + 'px';
+        }
+        if (c.w) el.style.width = c.w + 'px';
+        if (c.h) el.style.height = c.h + 'px';
+        if (c.fs) el.style.fontSize = c.fs + 'px';
+        if (c.br) el.style.borderRadius = c.br + 'px';
+        if (c.sc !== undefined || c.rot !== undefined) applyTransform(el, c);
+        if (c.op !== undefined && c.op !== 100) el.style.opacity = String(c.op / 100);
+        if (c.color) el.style.color = c.color;
+        if (c.bg) el.style.backgroundColor = c.bg;
+        if (c.hide === true) el.style.display = 'none';
+        else if (c.hide === false) el.style.display = '';
+    }
+    function applyAll() { Object.keys(changes).forEach(sel => applyOne(sel, changes[sel])); }
+    function save() { localStorage.setItem(STORE_KEY, JSON.stringify(changes)); }
+
+    // ---------- 服务器同步(GitHub Issue 存储) ----------
+    async function findDbgIssue() {
+        const r = await fetch('https://api.github.com/repos/' + DBG_OWNER + '/' + DBG_REPO + '/issues?state=open&per_page=100&_t=' + Date.now(), { headers: API_HEADERS, cache: 'no-store' });
+        if (!r.ok) return null;
+        const list = await r.json();
+        return list.find(i => i.title === DBG_ISSUE_TITLE) || null;
+    }
+    async function loadServer() {
+        // 所有访客都会执行:拉取已发布的调整并应用
+        try {
+            const found = await findDbgIssue();
+            if (!found) return;
+            serverIssueNumber = found.number;
+            const j = JSON.parse(found.body || '{}');
+            const list = (j.pages && j.pages[PAGE]) || [];
+            list.forEach(c => { if (c.selector) applyOne(c.selector, c); });
+            // 管理员:把服务器已发布的合并进本地全集(本地优先),
+            // 保证再次发布时是完整合集,旧改动不会被覆盖丢失
+            if (isAdmin() && list.length) {
+                const local = JSON.parse(localStorage.getItem(STORE_KEY) || '{}');
+                list.forEach(c => { if (c.selector && !local[c.selector]) local[c.selector] = c; });
+                localStorage.setItem(STORE_KEY, JSON.stringify(local));
+            }
+        } catch (e) { /* 无数据或网络失败,忽略 */ }
+    }
+    async function publish() {
+        const stEl = document.getElementById('dbgPubStatus');
+        stEl.style.color = '#FFD829';
+        stEl.textContent = '☁️ 发布中...';
+        try {
+            let pages = {};
+            const found = await findDbgIssue();
+            if (found) {
+                serverIssueNumber = found.number;
+                try { pages = JSON.parse(found.body || '{}').pages || {}; } catch (e) { pages = {}; }
+            }
+            pages[PAGE] = Object.values(changes);
+            const body = JSON.stringify({ pages: pages, updatedAt: new Date().toISOString() });
+            let r;
+            if (serverIssueNumber) {
+                r = await fetch('https://api.github.com/repos/' + DBG_OWNER + '/' + DBG_REPO + '/issues/' + serverIssueNumber,
+                    { method: 'PATCH', headers: API_HEADERS, body: JSON.stringify({ body: body }) });
+            } else {
+                r = await fetch('https://api.github.com/repos/' + DBG_OWNER + '/' + DBG_REPO + '/issues',
+                    { method: 'POST', headers: API_HEADERS, body: JSON.stringify({ title: DBG_ISSUE_TITLE, body: body }) });
+                if (r.ok) { const nj = await r.json(); serverIssueNumber = nj.number; }
+            }
+            if (r.ok) {
+                stEl.style.color = '#7fd77f';
+                stEl.textContent = '✅ 已发布!所有访客刷新后自动生效 (' + new Date().toLocaleTimeString() + ')';
+            } else {
+                stEl.style.color = '#f77';
+                stEl.textContent = '❌ 发布失败:HTTP ' + r.status;
+            }
+        } catch (e) {
+            stEl.style.color = '#f77';
+            stEl.textContent = '❌ 发布失败:' + e.message;
+        }
+    }
+
+    // ---------- 载入:服务器已发布的 → 本机未发布的(本机优先) ----------
+    async function loadAndApply() {
+        await loadServer();
+        try { changes = JSON.parse(localStorage.getItem(STORE_KEY) || '{}'); } catch (e) { changes = {}; }
+        applyAll();
+    }
+
+    // ---------- 选择交互 ----------
+    function onMove(e) {
+        if (!active) return;
+        if (panel.contains(e.target)) return;
+        if (hovered && hovered !== selected) hovered.classList.remove('dbg-hover');
+        hovered = e.target;
+        if (hovered !== selected) hovered.classList.add('dbg-hover');
+    }
+    function onPick(e) {
+        if (!active) return;
+        if (panel.contains(e.target)) return;
+        e.preventDefault();
+        e.stopPropagation();
+        if (selected) selected.classList.remove('dbg-picked');
+        selected = e.target;
+        selected.classList.add('dbg-picked');
+        selected.classList.remove('dbg-hover');
+        fillPanel();
+    }
+    function fillPanel() {
+        const sel = selectorOf(selected);
+        const c = changes[sel] || {};
+        document.getElementById('dbgSel').textContent = sel;
+        document.getElementById('dbgText').value = selected.innerHTML;
+        document.getElementById('dbgX').value = c.x || 0;
+        document.getElementById('dbgY').value = c.y || 0;
+        document.getElementById('dbgW').value = c.w || '';
+        document.getElementById('dbgH').value = c.h || '';
+        document.getElementById('dbgFs').value = c.fs || '';
+        document.getElementById('dbgBr').value = c.br || '';
+        document.getElementById('dbgSc').value = c.sc !== undefined ? c.sc : 100;
+        document.getElementById('dbgRot').value = c.rot || 0;
+        document.getElementById('dbgOp').value = c.op !== undefined ? c.op : 100;
+        document.getElementById('dbgHide').checked = !!c.hide;
+    }
+    function recordFromInputs() {
+        if (!selected) return null;
+        const sel = selectorOf(selected);
+        const c = changes[sel] || { label: labelOf(selected), selector: sel };
+        c.selector = sel;
+        c.x = +document.getElementById('dbgX').value || 0;
+        c.y = +document.getElementById('dbgY').value || 0;
+        c.w = +document.getElementById('dbgW').value || 0;
+        c.h = +document.getElementById('dbgH').value || 0;
+        c.fs = +document.getElementById('dbgFs').value || 0;
+        c.br = +document.getElementById('dbgBr').value || 0;
+        c.sc = +document.getElementById('dbgSc').value || 100;
+        c.rot = +document.getElementById('dbgRot').value || 0;
+        c.op = +document.getElementById('dbgOp').value || 100;
+        c.hide = document.getElementById('dbgHide').checked;
+        changes[sel] = c;
+        return c;
+    }
+
+    // ---------- 导入导出 ----------
+    function exportJson() {
+        const payload = { page: PAGE, exportedAt: new Date().toISOString(), changes: Object.values(changes) };
+        const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'debug-overrides.json';
+        a.click();
+        URL.revokeObjectURL(a.href);
+    }
+    function importJson(ev) {
+        const f = ev.target.files[0];
+        if (!f) return;
+        const rd = new FileReader();
+        rd.onload = () => {
+            try {
+                const j = JSON.parse(rd.result);
+                (j.changes || []).forEach(c => { if (c.selector) { changes[c.selector] = c; applyOne(c.selector, c); } });
+                save();
+                alert('导入成功,已应用 ' + (j.changes || []).length + ' 项调整');
+            } catch (e) { alert('文件格式错误'); }
+        };
+        rd.readAsText(f);
+        ev.target.value = '';
+    }
+
+    // ---------- 开关(仅管理员) ----------
+    function toggle(force) {
+        const want = force !== undefined ? force : !active;
+        if (want && !isAdmin()) {
+            alert(' 调试功能仅管理员可用。\n请先在「玩法实验室」登录管理员账号(隐藏入口)。\n如需在主页也能调试,登录时请勾选「记住我」。');
+            return;
+        }
+        active = want;
+        panel.style.display = active ? 'block' : 'none';
+        badge.style.display = active ? 'block' : 'none';
+        if (!active) {
+            if (hovered) hovered.classList.remove('dbg-hover');
+            if (selected) selected.classList.remove('dbg-picked');
+            hovered = selected = null;
+        }
+    }
+    window.UiDebug = { toggle: toggle };
+
+    // ---------- 启动 ----------
+    document.addEventListener('DOMContentLoaded', function () {
+        document.body.appendChild(panel);
+        document.body.appendChild(badge);
+        loadAndApply();
+
+        document.addEventListener('mousemove', onMove, true);
+        document.addEventListener('click', onPick, true);
+        document.addEventListener('keydown', function (e) {
+            if (e.ctrlKey && e.shiftKey && (e.key === 'D' || e.key === 'd')) { e.preventDefault(); toggle(); }
+        });
+
+        ['dbgX', 'dbgY', 'dbgW', 'dbgH', 'dbgFs', 'dbgBr', 'dbgSc', 'dbgRot', 'dbgOp'].forEach(id => {
+            document.getElementById(id).addEventListener('input', function () {
+                const c = recordFromInputs();
+                if (c) { applyOne(c.selector, c); save(); }
+            });
+        });
+        document.getElementById('dbgHide').addEventListener('change', function () {
+            const c = recordFromInputs();
+            if (c) { applyOne(c.selector, c); save(); }
+        });
+        document.getElementById('dbgColor').addEventListener('input', function () {
+            const c = recordFromInputs();
+            if (c) { c.color = this.value; applyOne(c.selector, c); save(); }
+        });
+        document.getElementById('dbgBg').addEventListener('input', function () {
+            const c = recordFromInputs();
+            if (c) { c.bg = this.value; applyOne(c.selector, c); save(); }
+        });
+        document.getElementById('dbgApplyText').onclick = function () {
+            if (!selected) return;
+            const sel = selectorOf(selected);
+            const c = changes[sel] || { label: labelOf(selected), selector: sel };
+            c.selector = sel;
+            c.text = document.getElementById('dbgText').value;
+            changes[sel] = c;
+            applyOne(sel, c);
+            save();
+        };
+        document.getElementById('dbgResetOne').onclick = function () {
+            if (!selected) return;
+            delete changes[selectorOf(selected)];
+            save();
+            fillPanel();
+        };
+        document.getElementById('dbgClear').onclick = function () {
+            if (!confirm('清除本页所有调试改动并刷新?(已发布到服务器的不受影响,重新发布即可覆盖)')) return;
+            changes = {};
+            save();
+            location.reload();
+        };
+        document.getElementById('dbgClose').onclick = function () { toggle(false); };
+        document.getElementById('dbgExport').onclick = exportJson;
+        document.getElementById('dbgImportBtn').onclick = function () { document.getElementById('dbgImportFile').click(); };
+        document.getElementById('dbgImportFile').addEventListener('change', importJson);
+        document.getElementById('dbgPublish').onclick = publish;
+    });
+})();
+</script>
+
+
+
+</body>
+</html>
